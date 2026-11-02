@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Select Preferred Time Slot')}"></head>
+<body>
+<div th:replace="~{fragments/header :: navbar}"></div>
+
+<main class="py-5">
+    <div class="container">
+        <div class="text-center mb-4">
+            <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-1 rounded-pill">STEP 2 OF 3</span>
+            <h2 class="fw-bold text-primary mt-1">Select Preferred Time Slot</h2>
+            <p class="text-muted">
+                Travel Date: <strong class="text-primary fs-5" th:text="${travelDate}">2026-11-03</strong>
+                <a th:href="@{/calendar}" class="small text-decoration-none ms-2"><i class="fas fa-edit"></i> Change Date</a>
+            </p>
+        </div>
+
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <form th:action="@{/find-bus}" method="get" id="slotForm">
+                    <input type="hidden" name="travelDate" th:value="${travelDate}">
+
+                    <div class="custom-card p-4 shadow-sm mb-4">
+                        <h5 class="fw-bold text-primary mb-3"><i class="fas fa-clock me-2"></i> Standard Campus Time Slots</h5>
+                        <p class="text-muted small mb-4">Select your departure window. Our fleet operates across morning shifts, midday returns, and evening schedules.</p>
+
+                        <div class="row g-3">
+                            <!-- 6:00 AM -->
+                            <div class="col-md-6 col-lg-4">
+                                <label class="w-100">
+                                    <input type="radio" name="preferredTimeSlot" value="06:00" class="btn-check" id="slot6am" required>
+                                    <div class="btn btn-outline-primary w-100 p-3 text-start rounded-4 h-100 d-flex flex-column justify-content-between">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="fw-bold fs-5">06:00 AM</span>
+                                            <span class="badge bg-primary">Morning</span>
+                                        </div>
+                                        <div class="small text-muted">Early Shift Express for Suburban Hubs (Pallavaram/Central)</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- 7:00 AM -->
+                            <div class="col-md-6 col-lg-4">
+                                <label class="w-100">
+                                    <input type="radio" name="preferredTimeSlot" value="07:00" class="btn-check" id="slot7am" checked>
+                                    <div class="btn btn-outline-primary w-100 p-3 text-start rounded-4 h-100 d-flex flex-column justify-content-between">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="fw-bold fs-5">07:00 AM</span>
+                                            <span class="badge bg-success">Peak Load</span>
+                                        </div>
+                                        <div class="small text-muted">Main Regular Morning Inbound to College Campus</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- 8:00 AM -->
+                            <div class="col-md-6 col-lg-4">
+                                <label class="w-100">
+                                    <input type="radio" name="preferredTimeSlot" value="08:00" class="btn-check" id="slot8am">
+                                    <div class="btn btn-outline-primary w-100 p-3 text-start rounded-4 h-100 d-flex flex-column justify-content-between">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="fw-bold fs-5">08:00 AM</span>
+                                            <span class="badge bg-info text-dark">Shift 2</span>
+                                        </div>
+                                        <div class="small text-muted">Secondary Morning Batch for Classes Starting at 09:00 AM</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- 9:00 AM -->
+                            <div class="col-md-6 col-lg-4">
+                                <label class="w-100">
+                                    <input type="radio" name="preferredTimeSlot" value="09:00" class="btn-check" id="slot9am">
+                                    <div class="btn btn-outline-primary w-100 p-3 text-start rounded-4 h-100 d-flex flex-column justify-content-between">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="fw-bold fs-5">09:00 AM</span>
+                                            <span class="badge bg-secondary">Late Morning</span>
+                                        </div>
+                                        <div class="small text-muted">Faculty & Laboratory Sessions Departure Window</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- 12:00 PM -->
+                            <div class="col-md-6 col-lg-4">
+                                <label class="w-100">
+                                    <input type="radio" name="preferredTimeSlot" value="12:00" class="btn-check" id="slot12pm">
+                                    <div class="btn btn-outline-primary w-100 p-3 text-start rounded-4 h-100 d-flex flex-column justify-content-between">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="fw-bold fs-5">12:00 PM</span>
+                                            <span class="badge bg-warning text-dark">Exam Special</span>
+                                        </div>
+                                        <div class="small text-muted">Midday Return Trip for Forenoon Examination Batches</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- 3:00 PM -->
+                            <div class="col-md-6 col-lg-4">
+                                <label class="w-100">
+                                    <input type="radio" name="preferredTimeSlot" value="15:00" class="btn-check" id="slot3pm">
+                                    <div class="btn btn-outline-primary w-100 p-3 text-start rounded-4 h-100 d-flex flex-column justify-content-between">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="fw-bold fs-5">03:00 PM</span>
+                                            <span class="badge bg-secondary">Afternoon</span>
+                                        </div>
+                                        <div class="small text-muted">Early Afternoon Return Service from College Main Campus</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- 5:00 PM -->
+                            <div class="col-md-6 col-lg-4">
+                                <label class="w-100">
+                                    <input type="radio" name="preferredTimeSlot" value="17:00" class="btn-check" id="slot5pm">
+                                    <div class="btn btn-outline-primary w-100 p-3 text-start rounded-4 h-100 d-flex flex-column justify-content-between">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="fw-bold fs-5">05:00 PM</span>
+                                            <span class="badge bg-dark">Evening Rush</span>
+                                        </div>
+                                        <div class="small text-muted">Full Evening Regular Return Service for All Corridors</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- All Slots Option -->
+                            <div class="col-md-6 col-lg-4">
+                                <label class="w-100">
+                                    <input type="radio" name="preferredTimeSlot" value="ALL" class="btn-check" id="slotAll">
+                                    <div class="btn btn-outline-secondary w-100 p-3 text-start rounded-4 h-100 d-flex flex-column justify-content-between">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="fw-bold fs-5">All Day Slots</span>
+                                            <span class="badge bg-light text-dark border">View All</span>
+                                        </div>
+                                        <div class="small text-muted">Display every scheduled departure trip on this travel date</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4 pt-3 border-top">
+                            <button type="submit" class="btn btn-primary-custom btn-lg px-5 py-2">
+                                Continue to Matching Buses <i class="fas fa-arrow-right ms-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/aadhi-widget :: aadhiWidget}"></div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

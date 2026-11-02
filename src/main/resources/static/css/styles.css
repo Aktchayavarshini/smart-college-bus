@@ -1,0 +1,525 @@
+/* ===================================================================
+   SMART COLLEGE BUS ALLOCATION SYSTEM - STYLESHEET
+   Navy Blue & Light Blue Modern Academic Theme
+   =================================================================== */
+
+:root {
+    --primary-navy: #0f2a4a;
+    --primary-navy-dark: #0a1c32;
+    --primary-blue: #1e40af;
+    --accent-blue: #0284c7;
+    --light-blue: #e0f2fe;
+    --ice-blue: #f0f9ff;
+    --bg-light: #f8fafc;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --success-green: #10b981;
+    --warning-orange: #f59e0b;
+    --danger-red: #ef4444;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    --card-hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+body {
+    background-color: var(--bg-light);
+    color: var(--text-main);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* ---------------- Navbar & Brand ---------------- */
+.navbar-custom {
+    background: linear-gradient(135deg, var(--primary-navy) 0%, #1e3a8a 100%);
+    box-shadow: 0 2px 8px rgba(15, 42, 74, 0.2);
+    padding: 0.85rem 1rem;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #ffffff !important;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.brand-icon {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 8px 12px;
+    border-radius: 12px;
+    color: #38bdf8;
+}
+
+.nav-link {
+    color: #e2e8f0 !important;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    padding: 0.5rem 0.85rem !important;
+    border-radius: 8px;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* ---------------- Hero Banner ---------------- */
+.hero-section {
+    background: linear-gradient(135deg, var(--primary-navy) 0%, #1d4ed8 100%);
+    color: #ffffff;
+    padding: 4.5rem 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    background: radial-gradient(circle at 80% 20%, rgba(56, 189, 248, 0.18) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.hero-title {
+    font-size: 2.75rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+}
+
+.hero-subtitle {
+    font-size: 1.15rem;
+    color: #bae6fd;
+    max-width: 650px;
+    margin: 1.25rem 0;
+}
+
+/* ---------------- Cards & Panels ---------------- */
+.custom-card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+}
+
+.custom-card:hover {
+    box-shadow: var(--card-hover-shadow);
+}
+
+.card-lift:hover {
+    transform: translateY(-4px);
+}
+
+.stat-card {
+    border-radius: 16px;
+    padding: 1.5rem;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+}
+
+.stat-val {
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: var(--primary-navy);
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-top: 0.35rem;
+}
+
+/* ---------------- Buttons ---------------- */
+.btn-primary-custom {
+    background: linear-gradient(135deg, var(--accent-blue) 0%, var(--primary-blue) 100%);
+    color: #ffffff;
+    border: none;
+    font-weight: 600;
+    padding: 0.65rem 1.4rem;
+    border-radius: 30px;
+    box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.25);
+    transition: all 0.2s ease;
+}
+
+.btn-primary-custom:hover {
+    background: linear-gradient(135deg, #0369a1 0%, #1e3a8a 100%);
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px -2px rgba(2, 132, 199, 0.35);
+}
+
+.btn-outline-custom {
+    border: 2px solid var(--accent-blue);
+    color: var(--accent-blue);
+    font-weight: 600;
+    padding: 0.6rem 1.35rem;
+    border-radius: 30px;
+    background: transparent;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-custom:hover {
+    background: var(--light-blue);
+    color: var(--primary-blue);
+}
+
+/* ---------------- Badges ---------------- */
+.badge-role {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.badge-student { background: #dbeafe; color: #1e40af; }
+.badge-teacher { background: #fef3c7; color: #b45309; }
+.badge-admin { background: #fee2e2; color: #b91c1c; }
+
+/* ---------------- Bus Cards ---------------- */
+.bus-card {
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+    box-shadow: var(--card-shadow);
+    transition: all 0.2s ease;
+}
+
+.bus-card:hover {
+    border-color: #93c5fd;
+    box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.12);
+}
+
+.bus-card.bus-full {
+    border-left: 5px solid var(--danger-red);
+}
+
+.bus-card.bus-available {
+    border-left: 5px solid var(--success-green);
+}
+
+.seat-indicator {
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.seat-avail { background: #ecfdf5; color: #047857; }
+.seat-low { background: #fffbeb; color: #b45309; }
+.seat-empty { background: #fef2f2; color: #b91c1c; }
+
+/* ---------------- Timeline for Stops ---------------- */
+.stop-timeline {
+    position: relative;
+    padding-left: 2rem;
+    margin-top: 1.5rem;
+}
+
+.stop-timeline::before {
+    content: '';
+    position: absolute;
+    left: 9px;
+    top: 6px;
+    bottom: 6px;
+    width: 3px;
+    background: #cbd5e1;
+}
+
+.stop-timeline-item {
+    position: relative;
+    padding-bottom: 1.5rem;
+}
+
+.stop-timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+.stop-timeline-point {
+    position: absolute;
+    left: -2rem;
+    top: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 4px solid var(--accent-blue);
+    box-shadow: 0 0 0 3px #e0f2fe;
+}
+
+.stop-timeline-item.start .stop-timeline-point { border-color: var(--success-green); }
+.stop-timeline-item.end .stop-timeline-point { border-color: var(--danger-red); }
+
+/* ---------------- Floating "Talk to Aadhi" Chatbot Widget ---------------- */
+.aadhi-floating-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1050;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0284c7 0%, #1e40af 100%);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    cursor: pointer;
+    box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.5);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    border: 3px solid #ffffff;
+}
+
+.aadhi-floating-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 14px 28px -4px rgba(2, 132, 199, 0.6);
+}
+
+.aadhi-pulse-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #10b981;
+    border: 2px solid #ffffff;
+}
+
+.aadhi-chat-box {
+    position: fixed;
+    bottom: 100px;
+    right: 24px;
+    z-index: 1050;
+    width: 380px;
+    max-width: calc(100vw - 32px);
+    height: 540px;
+    max-height: calc(100vh - 130px);
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.2), 0 8px 10px -6px rgba(15, 23, 42, 0.1);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid #cbd5e1;
+    animation: aadhiSlideUp 0.25s ease forwards;
+}
+
+@keyframes aadhiSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.aadhi-header {
+    background: linear-gradient(135deg, var(--primary-navy) 0%, #1e3a8a 100%);
+    color: #ffffff;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.aadhi-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #38bdf8;
+    color: var(--primary-navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.aadhi-messages {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    background: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.aadhi-msg {
+    max-width: 82%;
+    padding: 0.75rem 1rem;
+    border-radius: 16px;
+    font-size: 0.92rem;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.aadhi-msg.bot {
+    align-self: flex-start;
+    background: #ffffff;
+    color: #1e293b;
+    border: 1px solid #e2e8f0;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.aadhi-msg.user {
+    align-self: flex-end;
+    background: linear-gradient(135deg, #0284c7 0%, #1e40af 100%);
+    color: #ffffff;
+    border-bottom-right-radius: 4px;
+}
+
+.aadhi-chips-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.aadhi-chip {
+    background: #e0f2fe;
+    color: #0369a1;
+    font-size: 0.78rem;
+    padding: 4px 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    border: 1px solid #bae6fd;
+    transition: all 0.15s ease;
+}
+
+.aadhi-chip:hover {
+    background: #0284c7;
+    color: #ffffff;
+}
+
+.aadhi-input-area {
+    padding: 0.75rem 1rem;
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.aadhi-input {
+    flex: 1;
+    border: 1px solid #cbd5e1;
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.aadhi-input:focus {
+    border-color: #0284c7;
+    box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.2);
+}
+
+.aadhi-send-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #0284c7;
+    color: #ffffff;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.aadhi-send-btn:hover {
+    background: #0369a1;
+}
+
+/* ---------------- Table & Forms ---------------- */
+.table-custom {
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+}
+
+.table-custom th {
+    background: #f1f5f9;
+    color: #334155;
+    font-weight: 600;
+    font-size: 0.88rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 0.85rem 1rem;
+}
+
+.table-custom td {
+    padding: 0.85rem 1rem;
+    vertical-align: middle;
+    border-top: 1px solid #f1f5f9;
+}
+
+.form-control, .form-select {
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    padding: 0.65rem 0.95rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #0284c7;
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
+
+/* ---------------- Footer ---------------- */
+.footer-custom {
+    background: var(--primary-navy-dark);
+    color: #94a3b8;
+    padding: 3rem 1rem 1.5rem;
+    margin-top: 4rem;
+}
+
+.footer-custom a {
+    color: #cbd5e1;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer-custom a:hover {
+    color: #38bdf8;
+}
+
+/* ---------------- Responsive ---------------- */
+@media (max-width: 768px) {
+    .hero-title { font-size: 2rem; }
+    .stat-card { padding: 1.1rem; }
+    .stat-val { font-size: 1.5rem; }
+    .aadhi-chat-box { width: calc(100vw - 24px); right: 12px; bottom: 85px; }
+}

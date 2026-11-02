@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="aadhiWidget">
+    <!-- Floating Circular Trigger Button -->
+    <div id="aadhiChatToggle" class="aadhi-floating-btn" title="Talk to Aadhi - Transport Assistant">
+        <i class="fas fa-robot"></i>
+        <span class="aadhi-pulse-badge"></span>
+    </div>
+
+    <!-- Floating Chat Window -->
+    <div id="aadhiChatBox" class="aadhi-chat-box">
+        <!-- Header -->
+        <div class="aadhi-header">
+            <div class="d-flex align-items-center gap-2">
+                <div class="aadhi-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div>
+                    <h6 class="mb-0 fw-bold text-white">Talk to Aadhi</h6>
+                    <small class="text-info d-flex align-items-center gap-1" style="font-size: 0.75rem;">
+                        <span class="badge bg-success p-1 rounded-circle"></span> Live DB Assistant
+                    </small>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-1">
+                <a th:href="@{/talk-to-aadhi}" class="text-white opacity-75 text-decoration-none px-2" title="Open Fullscreen Page">
+                    <i class="fas fa-expand-alt"></i>
+                </a>
+                <button type="button" id="aadhiChatClose" class="btn-close btn-close-white" aria-label="Close"></button>
+            </div>
+        </div>
+
+        <!-- Messages Area -->
+        <div id="aadhiMessages" class="aadhi-messages">
+            <div class="aadhi-msg bot">
+                <div>👋 Hello! I am <strong>Aadhi</strong>, your smart college bus assistant with real-time access to our <strong>CollegeBusDB</strong> database.</div>
+                <div class="mt-1 small text-muted">Ask me anything about routes, stops, seat counts, or return buses after exams!</div>
+                <div class="aadhi-chips-container">
+                    <span class="aadhi-chip">Find bus to Pallavaram</span>
+                    <span class="aadhi-chip">Buses for Tambaram</span>
+                    <span class="aadhi-chip">Show all routes</span>
+                    <span class="aadhi-chip">Exam return buses</span>
+                    <span class="aadhi-chip">How to book a seat?</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Bar -->
+        <div class="aadhi-input-area">
+            <input type="text" id="aadhiInputField" class="aadhi-input" placeholder="Type a place like Pallavaram, Guindy..." autocomplete="off">
+            <button type="button" id="aadhiSendBtn" class="aadhi-send-btn">
+                <i class="fas fa-paper-plane small"></i>
+            </button>
+        </div>
+    </div>
+</div>
+</body>
+</html>

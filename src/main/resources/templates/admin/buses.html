@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Bus Fleet Management - Admin')}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments/header :: navbar}"></div>
+
+<main class="py-4">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <a th:href="@{/admin/dashboard}" class="text-decoration-none small text-muted"><i class="fas fa-arrow-left me-1"></i> Admin Dashboard</a>
+                <h3 class="fw-bold text-primary mb-1"><i class="fas fa-bus me-2"></i> Bus Fleet Management</h3>
+                <p class="text-muted small mb-0">Register vehicles, manage seating capacities, and monitor maintenance status</p>
+            </div>
+            <button type="button" class="btn btn-primary-custom rounded-pill" data-bs-toggle="modal" data-bs-target="#addBusModal">
+                <i class="fas fa-plus me-1"></i> Register New Bus
+            </button>
+        </div>
+
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <div class="custom-card shadow-sm overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Bus Number</th>
+                            <th>Registration No.</th>
+                            <th>Total Capacity</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="bus : ${buses}">
+                            <td class="fw-bold" th:text="${bus.busId}">1</td>
+                            <td><span class="badge bg-primary fs-6" th:text="${bus.busNumber}">BUS-101</span></td>
+                            <td class="font-monospace" th:text="${bus.registrationNumber}">TN-09-CB-1001</td>
+                            <td><strong class="text-primary" th:text="${bus.totalSeats}">50</strong> Seats</td>
+                            <td><span class="badge bg-light text-dark border" th:text="${bus.busType}">AC</span></td>
+                            <td>
+                                <span th:if="${bus.busStatus == 'ACTIVE'}" class="badge bg-success">ACTIVE</span>
+                                <span th:if="${bus.busStatus == 'MAINTENANCE'}" class="badge bg-warning text-dark">MAINTENANCE</span>
+                                <span th:if="${bus.busStatus == 'INACTIVE'}" class="badge bg-secondary">INACTIVE</span>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-sm btn-outline-primary rounded-pill" data-bs-toggle="modal" th:data-bs-target="'#editBusModal-' + ${bus.busId}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <form th:action="@{/admin/buses/toggle/{id}(id=${bus.busId})}" method="post">
+                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                        <button type="submit" class="btn btn-sm btn-outline-warning rounded-pill" title="Toggle Maintenance">
+                                            <i class="fas fa-tools"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Add Bus Modal -->
+        <div class="modal fade" id="addBusModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content rounded-4 border-0 shadow">
+                    <div class="modal-header bg-primary text-white border-0">
+                        <h5 class="modal-title fw-bold">Register New Vehicle</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form th:action="@{/admin/buses/add}" th:object="${newBus}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Bus Fleet Number</label>
+                                <input type="text" th:field="*{busNumber}" class="form-control" placeholder="e.g. BUS-107" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Vehicle Registration Number</label>
+                                <input type="text" th:field="*{registrationNumber}" class="form-control" placeholder="e.g. TN-09-CB-1007" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Total Passenger Capacity</label>
+                                <input type="number" th:field="*{totalSeats}" class="form-control" placeholder="50" min="10" max="100" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Bus Type</label>
+                                <select th:field="*{busType}" class="form-select">
+                                    <option value="AC">AC (Air Conditioned)</option>
+                                    <option value="NON_AC" selected>Non-AC Regular</option>
+                                    <option value="DELUXE">Deluxe Campus Express</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Initial Operational Status</label>
+                                <select th:field="*{busStatus}" class="form-select">
+                                    <option value="ACTIVE" selected>ACTIVE</option>
+                                    <option value="MAINTENANCE">MAINTENANCE</option>
+                                    <option value="INACTIVE">INACTIVE</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0">
+                            <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary-custom rounded-pill">Save Vehicle</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Bus Modals -->
+        <div th:each="bus : ${buses}">
+            <div class="modal fade" th:id="'editBusModal-' + ${bus.busId}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content rounded-4 border-0 shadow">
+                        <div class="modal-header bg-primary text-white border-0">
+                            <h5 class="modal-title fw-bold">Edit Bus <span th:text="${bus.busNumber}">BUS-101</span></h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form th:action="@{/admin/buses/edit/{id}(id=${bus.busId})}" method="post">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Bus Number</label>
+                                    <input type="text" name="busNumber" class="form-control" th:value="${bus.busNumber}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Registration Number</label>
+                                    <input type="text" name="registrationNumber" class="form-control" th:value="${bus.registrationNumber}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Total Capacity</label>
+                                    <input type="number" name="totalSeats" class="form-control" th:value="${bus.totalSeats}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Bus Type</label>
+                                    <select name="busType" class="form-select">
+                                        <option value="AC" th:selected="${bus.busType == 'AC'}">AC</option>
+                                        <option value="NON_AC" th:selected="${bus.busType == 'NON_AC'}">Non-AC</option>
+                                        <option value="DELUXE" th:selected="${bus.busType == 'DELUXE'}">Deluxe</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Status</label>
+                                    <select name="busStatus" class="form-select">
+                                        <option value="ACTIVE" th:selected="${bus.busStatus == 'ACTIVE'}">ACTIVE</option>
+                                        <option value="MAINTENANCE" th:selected="${bus.busStatus == 'MAINTENANCE'}">MAINTENANCE</option>
+                                        <option value="INACTIVE" th:selected="${bus.busStatus == 'INACTIVE'}">INACTIVE</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="modal-footer border-0">
+                                <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary-custom rounded-pill">Update Vehicle</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

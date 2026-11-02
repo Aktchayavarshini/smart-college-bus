@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Exam Timetable & Return Bus Recommendations')}"></head>
+<body>
+<div th:replace="~{fragments/header :: navbar}"></div>
+
+<main class="py-4">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h3 class="fw-bold text-primary mb-1"><i class="fas fa-graduation-cap me-2"></i> Examination Timetable & Return Bus Recommendations</h3>
+                <p class="text-muted small mb-0">Automated departure bus matching based on exam finish times (11:30 AM ➔ 12:00 PM, 2:30 PM ➔ 3:00 PM, 4:30 PM ➔ 5:00 PM)</p>
+            </div>
+            <div>
+                <a th:href="@{/academic-timetable}" class="btn btn-sm btn-outline-secondary rounded-pill">
+                    <i class="fas fa-calendar-alt me-1"></i> Academic Timetable
+                </a>
+            </div>
+        </div>
+
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <!-- Explanatory Banner -->
+        <div class="p-3 bg-info bg-opacity-10 border border-info border-opacity-25 rounded-3 mb-4 d-flex align-items-center gap-3">
+            <i class="fas fa-robot fs-3 text-info"></i>
+            <div class="small">
+                <strong>Intelligent Return Bus Dispatch:</strong> Our recommendation engine calculates your exact exam conclusion time and queries live database trips to recommend optimal return transport.
+                <em>Recommendations only &mdash; seat reservations are confirmed only upon booking.</em>
+            </div>
+        </div>
+
+        <!-- Exam Recommendations Grid -->
+        <div class="row g-4 mb-4">
+            <div class="col-12" th:if="${recommendations == null || recommendations.isEmpty()}">
+                <div class="custom-card p-5 text-center text-muted">
+                    <i class="fas fa-clipboard-check fs-1 text-secondary opacity-50 mb-3"></i>
+                    <h5 class="fw-bold">No Examination Schedules Active</h5>
+                    <p class="small text-muted">No exams scheduled for your department currently.</p>
+                </div>
+            </div>
+
+            <div class="col-lg-6" th:each="rec : ${recommendations}">
+                <div class="custom-card p-4 h-100 d-flex flex-column justify-content-between shadow-sm border-top border-4 border-info">
+                    <div>
+                        <!-- Header -->
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-dark" th:text="${rec.examType}">SEMESTER_FINAL</span>
+                            <span class="badge bg-light text-dark border">Semester <span th:text="${rec.semester}">5</span></span>
+                        </div>
+
+                        <!-- Subject -->
+                        <h5 class="fw-bold text-primary mb-1" th:text="${rec.subjectName}">CS8591 - Computer Networks</h5>
+                        <div class="small text-muted mb-3" th:text="${rec.department}">Computer Science and Engineering</div>
+
+                        <!-- Exam Schedule Box -->
+                        <div class="p-3 bg-light rounded-3 small mb-3 border">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span><i class="fas fa-calendar-day text-secondary me-1"></i> Exam Date:</span>
+                                <strong class="text-dark" th:text="${rec.examDate}">2026-11-03</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span><i class="fas fa-hourglass-start text-secondary me-1"></i> Exam Duration:</span>
+                                <strong class="text-dark" th:text="${rec.examStartTime} + ' - ' + ${rec.examEndTime}">09:30 - 11:30 AM</strong>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span><i class="fas fa-bell text-danger me-1"></i> Exam Concludes:</span>
+                                <strong class="text-danger fw-bold" th:text="${rec.examEndTime}">11:30 AM</strong>
+                            </div>
+                        </div>
+
+                        <!-- Recommended Return Bus Card -->
+                        <div th:if="${rec.hasRecommendation}" class="p-3 bg-success bg-opacity-10 border border-success border-opacity-25 rounded-3 mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> Recommended Return Bus</span>
+                                <span class="badge bg-light text-dark border" th:text="${rec.recommendedTrip.tripType}">EXAM_SPECIAL</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="fw-bold text-dark mb-0" th:text="${rec.recommendedTrip.busNumber} + ' (' + ${rec.recommendedTrip.routeName} + ')'">BUS-101</h6>
+                                    <div class="small text-muted">
+                                        Departs Campus: <strong class="text-success" th:text="${rec.recommendedTrip.departureTime}">12:00 PM</strong>
+                                        | Seats: <strong th:text="${rec.recommendedTrip.availableSeats}">45</strong> available
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div th:if="${!rec.hasRecommendation}" class="alert alert-secondary py-2 px-3 small rounded-3 mb-2">
+                            <i class="fas fa-info-circle me-1"></i> No special return bus scheduled immediately after this exam. You can take the evening regular bus service.
+                        </div>
+                    </div>
+
+                    <!-- Book Recommended Bus Button -->
+                    <div class="pt-3 border-top d-flex justify-content-end" th:if="${rec.hasRecommendation}">
+                        <a th:href="@{/bus-details/{id}(id=${rec.recommendedTrip.tripId})}" class="btn btn-sm btn-primary-custom rounded-pill px-4">
+                            <i class="fas fa-ticket-alt me-1"></i> Book Recommended Bus
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/aadhi-widget :: aadhiWidget}"></div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

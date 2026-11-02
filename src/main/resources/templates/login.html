@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('User Login')}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments/header :: navbar}"></div>
+
+<main class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="custom-card p-4 p-md-5 shadow-lg">
+                    <div class="text-center mb-4">
+                        <div class="brand-icon d-inline-flex bg-primary bg-opacity-10 text-primary p-3 rounded-circle mb-3">
+                            <i class="fas fa-bus fs-2"></i>
+                        </div>
+                        <h3 class="fw-bold text-primary">Sign In</h3>
+                        <p class="text-muted small">Access your Smart College Bus Account</p>
+                    </div>
+
+                    <!-- Flash and Session Alerts -->
+                    <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+                    <form th:action="@{/login}" method="post">
+                        <!-- CSRF Token -->
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">College Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-envelope text-muted"></i></span>
+                                <input type="email" name="email" class="form-control" placeholder="name@collegebus.edu" required autofocus>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold small">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-lock text-muted"></i></span>
+                                <input type="password" name="password" class="form-control" placeholder="Enter your password" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary-custom w-100 py-2 mb-3">
+                            <i class="fas fa-sign-in-alt me-1"></i> Sign In to Portal
+                        </button>
+                    </form>
+
+                    <!-- Pre-seeded accounts guidance for college evaluator -->
+                    <div class="p-3 bg-light rounded-3 small border mb-3">
+                        <div class="fw-bold text-primary mb-1"><i class="fas fa-info-circle me-1"></i> Evaluator / Test Credentials:</div>
+                        <div class="d-flex justify-content-between text-muted">
+                            <span>Admin:</span> <code>admin@collegebus.edu</code> / <code>Admin@123</code>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted">
+                            <span>Student:</span> <code>student@collegebus.edu</code> / <code>Student@123</code>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted">
+                            <span>Teacher:</span> <code>teacher@collegebus.edu</code> / <code>Teacher@123</code>
+                        </div>
+                    </div>
+
+                    <div class="text-center small text-muted">
+                        Don't have an account? <a th:href="@{/register}" class="fw-bold text-primary text-decoration-none">Register as Student or Faculty</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/aadhi-widget :: aadhiWidget}"></div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

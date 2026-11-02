@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('Smart College Bus Allocation System')}"></head>
+<body>
+<div th:replace="~{fragments/header :: navbar}"></div>
+
+<main>
+    <!-- Hero Banner -->
+    <section class="hero-section text-center text-lg-start">
+        <div class="container position-relative" style="z-index: 2;">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-7">
+                    <span class="badge bg-light text-primary px-3 py-2 rounded-pill fw-bold mb-3">
+                        <i class="fas fa-shield-alt me-1 text-info"></i> Verified Campus Transit Network
+                    </span>
+                    <h1 class="hero-title">Smart College Bus Allocation System</h1>
+                    <p class="hero-subtitle">
+                        An integrated smart mobility platform for engineering and arts college campuses.
+                        Reserve seats, monitor route schedules, optimize exam return transit, and query the Aadhi database assistant in real time.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start mt-4">
+                        <a th:href="@{/calendar}" class="btn btn-primary-custom btn-lg">
+                            <i class="fas fa-calendar-check me-2"></i> Book Travel Seat
+                        </a>
+                        <a th:href="@{/talk-to-aadhi}" class="btn btn-outline-light btn-lg rounded-pill">
+                            <i class="fas fa-robot me-2"></i> Talk to Aadhi
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-lg-5">
+                    <!-- Quick Trip Search Card -->
+                    <div class="custom-card p-4 text-dark shadow-lg">
+                        <h4 class="fw-bold text-primary mb-3"><i class="fas fa-search-location me-2"></i> Quick Bus Search</h4>
+                        <p class="text-muted small mb-3">Step 1: Choose your travel date and preferred time slot to find matching fleet departures.</p>
+                        <form th:action="@{/select-slot}" method="get">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold small">Travel Date</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="fas fa-calendar-day text-primary"></i></span>
+                                    <input type="date" name="date" class="form-control" required th:min="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary-custom w-100 py-2">
+                                Continue to Time Slots <i class="fas fa-arrow-right ms-1"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- System Live Metrics Strip -->
+    <section class="py-4 bg-white border-bottom shadow-sm">
+        <div class="container">
+            <div class="row g-3 text-center">
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="fas fa-bus"></i>
+                        </div>
+                        <div>
+                            <div class="stat-val" th:text="${totalBuses}">6</div>
+                            <div class="stat-label">Buses Fleet</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-info bg-opacity-10 text-info">
+                            <i class="fas fa-route"></i>
+                        </div>
+                        <div>
+                            <div class="stat-val" th:text="${totalRoutes}">5</div>
+                            <div class="stat-label">Active Routes</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div>
+                            <div class="stat-val" th:text="${totalStops}">15</div>
+                            <div class="stat-label">Approved Stops</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-success bg-opacity-10 text-success">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div>
+                            <div class="stat-val" th:text="${totalTrips}">13</div>
+                            <div class="stat-label">Daily Scheduled Trips</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Modules Showcase -->
+    <section class="py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-2 rounded-pill">ARCHITECTURAL FEATURES</span>
+                <h2 class="fw-bold mt-2 text-primary">End-to-End Campus Transportation</h2>
+                <p class="text-muted">Designed for Day Scholars, Hostel Students, Faculty, and Transport Controllers</p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="custom-card p-4 h-100 card-lift">
+                        <div class="stat-icon bg-primary text-white mb-3">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <h5 class="fw-bold text-primary">Date & Time Slot Selection</h5>
+                        <p class="text-muted small">
+                            Users must select their travel date and preferred time slot (6 AM, 7 AM, 8 AM, 9 AM, 12 PM, 3 PM, 5 PM) first.
+                            Past dates are rejected by frontend and backend validation.
+                        </p>
+                        <a th:href="@{/calendar}" class="text-decoration-none fw-bold small text-primary">Open Calendar <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="custom-card p-4 h-100 card-lift">
+                        <div class="stat-icon bg-success text-white mb-3">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <h5 class="fw-bold text-success">Live Seat Allocation</h5>
+                        <p class="text-muted small">
+                            Available seats are calculated directly from confirmed database records. Prevents double-booking and enforces booking cutoff times.
+                            Safe cancellation releases seats instantly.
+                        </p>
+                        <a th:href="@{/find-bus?travelDate=2026-11-03&preferredTimeSlot=07:00}" class="text-decoration-none fw-bold small text-success">Inspect Matching Buses <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="custom-card p-4 h-100 card-lift">
+                        <div class="stat-icon bg-info text-white mb-3">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h5 class="fw-bold text-info">Exam Return Bus Recommender</h5>
+                        <p class="text-muted small">
+                            Intelligently matches university and midterm examination finish times (e.g. 11:30 AM, 2:30 PM, 4:30 PM) to suitable return departure trips.
+                        </p>
+                        <a th:href="@{/exam-timetable}" class="text-decoration-none fw-bold small text-info">View Exam Buses <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="custom-card p-4 h-100 card-lift">
+                        <div class="stat-icon bg-warning text-dark mb-3">
+                            <i class="fas fa-hand-paper"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark">Seat Request Management</h5>
+                        <p class="text-muted small">
+                            When a bus reaches 100% capacity, passengers can place a prioritized seat request. Administrators review and approve requests safely without overbooking.
+                        </p>
+                        <a th:href="@{/my-bookings}" class="text-decoration-none fw-bold small text-warning">Track Requests <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="custom-card p-4 h-100 card-lift">
+                        <div class="stat-icon bg-danger text-white mb-3">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <h5 class="fw-bold text-danger">Passenger-Demand Analytics</h5>
+                        <p class="text-muted small">
+                            Real-time reporting detects high-demand corridors like Pallavaram & Velachery, calculating occupancy rates to recommend extra vehicle deployment.
+                        </p>
+                        <a th:href="@{/admin/reports}" class="text-decoration-none fw-bold small text-danger">View Reports <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="custom-card p-4 h-100 card-lift border-primary">
+                        <div class="stat-icon bg-primary text-white mb-3">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <h5 class="fw-bold text-primary">Talk to Aadhi Assistant</h5>
+                        <p class="text-muted small">
+                            Database-connected virtual transportation agent. Inquires live trip schedules, route stops, seat availability, and connecting trips directly.
+                        </p>
+                        <a th:href="@{/talk-to-aadhi}" class="text-decoration-none fw-bold small text-primary">Chat with Aadhi <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chennai Routes Section -->
+    <section class="py-5 bg-white border-top">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <div>
+                    <h3 class="fw-bold text-primary mb-1">Active Chennai Bus Routes</h3>
+                    <p class="text-muted small mb-0">Covering major transport hubs, metro connections and suburban zones</p>
+                </div>
+                <a th:href="@{/calendar}" class="btn btn-outline-custom">Book Seat on Route</a>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6 col-lg-4" th:each="route : ${routes}">
+                    <div class="custom-card p-3 h-100 border-start border-4 border-primary">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="fw-bold text-primary mb-0" th:text="${route.routeName}">Route Name</h6>
+                            <span class="badge bg-success" th:text="${route.routeStatus}">ACTIVE</span>
+                        </div>
+                        <div class="small text-muted mb-2">
+                            <i class="fas fa-map-pin text-danger me-1"></i>
+                            <span th:text="${route.source}">Source</span> ➔ <span th:text="${route.destination}">Campus</span>
+                        </div>
+                        <p class="small text-secondary mb-0" th:text="${route.routeDescription}">Description</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div th:replace="~{fragments/aadhi-widget :: aadhiWidget}"></div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

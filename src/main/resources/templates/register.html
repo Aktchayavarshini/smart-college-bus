@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Register Account')}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments/header :: navbar}"></div>
+
+<main class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-7">
+                <div class="custom-card p-4 p-md-5 shadow-lg">
+                    <div class="text-center mb-4">
+                        <h3 class="fw-bold text-primary">Create Your Account</h3>
+                        <p class="text-muted small">Join the Smart College Bus Allocation System</p>
+                    </div>
+
+                    <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+                    <form th:action="@{/register}" th:object="${userDto}" method="post">
+                        <!-- CSRF Token -->
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+                        <!-- Role Selection -->
+                        <div class="mb-4 text-center">
+                            <label class="form-label fw-bold text-primary mb-2">Select Your Institution Role</label>
+                            <select class="form-select form-select-lg mx-auto w-75 text-center fw-bold text-primary" id="roleSelect" th:field="*{role}" required>
+                                <option value="STUDENT" selected>🎓 Student</option>
+                                <option value="TEACHER">👨‍🏫 Teacher / Faculty</option>
+                            </select>
+                            <small class="text-muted d-block mt-1">Admin accounts are provisioned via system administrator privileges.</small>
+                        </div>
+
+                        <!-- Basic User Details -->
+                        <h6 class="fw-bold text-secondary border-bottom pb-2 mb-3">General Information</h6>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small">Full Name</label>
+                                <input type="text" th:field="*{fullName}" class="form-control" placeholder="Mukesh K" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small">College Email Address</label>
+                                <input type="email" th:field="*{email}" class="form-control" placeholder="mukesh@collegebus.edu" required>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small">Password (Min 6 Characters)</label>
+                                <input type="password" th:field="*{password}" class="form-control" placeholder="••••••••" minlength="6" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small">Phone Number</label>
+                                <input type="tel" th:field="*{phoneNumber}" class="form-control" placeholder="9840123456" required>
+                            </div>
+                        </div>
+
+                        <!-- Student Specific Fields -->
+                        <div id="studentFields" style="display: block;">
+                            <h6 class="fw-bold text-primary border-bottom pb-2 mb-3"><i class="fas fa-user-graduate me-1"></i> Student Academic Details</h6>
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold small">Roll Number / Register No.</label>
+                                    <input type="text" th:field="*{rollNumber}" class="form-control" placeholder="e.g. 714021104001">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold small">Department</label>
+                                    <select class="form-select" th:field="*{studentDepartment}">
+                                        <option value="Computer Science and Engineering">Computer Science and Engineering</option>
+                                        <option value="Information Technology">Information Technology</option>
+                                        <option value="Electronics and Communication Engineering">Electronics and Communication Engineering</option>
+                                        <option value="Mechanical Engineering">Mechanical Engineering</option>
+                                        <option value="Electrical and Electronics Engineering">Electrical and Electronics Engineering</option>
+                                        <option value="Civil Engineering">Civil Engineering</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold small">Academic Year</label>
+                                    <select class="form-select" th:field="*{academicYear}">
+                                        <option value="1">1st Year</option>
+                                        <option value="2">2nd Year</option>
+                                        <option value="3" selected>3rd Year</option>
+                                        <option value="4">4th Year</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold small">Semester</label>
+                                    <select class="form-select" th:field="*{semester}">
+                                        <option value="1">Semester 1</option>
+                                        <option value="2">Semester 2</option>
+                                        <option value="3">Semester 3</option>
+                                        <option value="4">Semester 4</option>
+                                        <option value="5" selected>Semester 5</option>
+                                        <option value="6">Semester 6</option>
+                                        <option value="7">Semester 7</option>
+                                        <option value="8">Semester 8</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold small">Student Type</label>
+                                    <select class="form-select" id="studentTypeSelect" th:field="*{studentType}">
+                                        <option value="DAY_SCHOLAR" selected>Day Scholar</option>
+                                        <option value="HOSTEL">Hostel Resident</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-3" id="hostelNameGroup" style="display: none;">
+                                <label class="form-label fw-semibold small">Hostel Block Name</label>
+                                <input type="text" th:field="*{hostelName}" class="form-control" placeholder="e.g. Kaveri Block B">
+                            </div>
+                        </div>
+
+                        <!-- Teacher Specific Fields -->
+                        <div id="teacherFields" style="display: none;">
+                            <h6 class="fw-bold text-primary border-bottom pb-2 mb-3"><i class="fas fa-chalkboard-teacher me-1"></i> Faculty Details</h6>
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold small">Employee ID</label>
+                                    <input type="text" th:field="*{employeeId}" class="form-control" placeholder="e.g. FAC-CSE-012">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold small">Designation</label>
+                                    <input type="text" th:field="*{designation}" class="form-control" placeholder="e.g. Assistant Professor">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold small">Department</label>
+                                <select class="form-select" th:field="*{teacherDepartment}">
+                                    <option value="Computer Science and Engineering">Computer Science and Engineering</option>
+                                    <option value="Information Technology">Information Technology</option>
+                                    <option value="Electronics and Communication Engineering">Electronics and Communication Engineering</option>
+                                    <option value="Mechanical Engineering">Mechanical Engineering</option>
+                                    <option value="Electrical and Electronics Engineering">Electrical and Electronics Engineering</option>
+                                    <option value="Civil Engineering">Civil Engineering</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary-custom w-100 py-2 mt-4">
+                            <i class="fas fa-user-check me-1"></i> Complete Registration
+                        </button>
+                    </form>
+
+                    <div class="text-center small text-muted mt-3">
+                        Already have an account? <a th:href="@{/login}" class="fw-bold text-primary text-decoration-none">Log in here</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/aadhi-widget :: aadhiWidget}"></div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

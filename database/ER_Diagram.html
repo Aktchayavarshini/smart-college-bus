@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart College Bus Allocation System - Entity Relationship Diagram</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #f8fafc; font-family: 'Segoe UI', system-ui, sans-serif; color: #1e293b; }
+        .hero-banner { background: linear-gradient(135deg, #0f2a4a 0%, #1e3a8a 100%); color: white; padding: 2.5rem 1rem; margin-bottom: 2rem; }
+        .table-card { border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; height: 100%; transition: transform 0.2s; }
+        .table-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .card-header-table { padding: 0.75rem 1rem; border-top-left-radius: 0.75rem; border-top-right-radius: 0.75rem; font-weight: 700; font-size: 1.05rem; }
+        .badge-pk { background-color: #0284c7; color: white; font-size: 0.75rem; }
+        .badge-fk { background-color: #ea580c; color: white; font-size: 0.75rem; }
+        .col-item { padding: 0.4rem 0.75rem; font-family: monospace; font-size: 0.85rem; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; }
+        .col-item:last-child { border-bottom: none; }
+        .rel-card { background: white; border-radius: 0.5rem; padding: 1rem; border-left: 4px solid #3b82f6; margin-bottom: 0.75rem; }
+    </style>
+</head>
+<body>
+    <div class="hero-banner text-center">
+        <div class="container">
+            <h1 class="fw-bold mb-2"><i class="fas fa-bus-alt me-2"></i> Smart College Bus Allocation System</h1>
+            <p class="lead mb-0">Entity-Relationship Diagram & Database Architectural Model (CollegeBusDB)</p>
+            <div class="mt-2 text-info-emphasis">13 Relational Tables &bull; InnoDB Engine &bull; utf8mb4 &bull; Referential Integrity Enforced</div>
+        </div>
+    </div>
+
+    <div class="container pb-5">
+        <div class="row g-4 mb-5">
+            <!-- 1. users -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card table-card">
+                    <div class="card-header card-header-table bg-primary text-white"><i class="fas fa-users me-2"></i> users</div>
+                    <div class="card-body p-0">
+                        <div class="col-item"><span class="fw-bold text-primary"><span class="badge badge-pk me-1">PK</span> user_id</span> <span>BIGINT (AI)</span></div>
+                        <div class="col-item"><span>full_name</span> <span>VARCHAR(100)</span></div>
+                        <div class="col-item"><span>email</span> <span class="badge bg-secondary">UNIQUE</span></div>
+                        <div class="col-item"><span>password</span> <span>VARCHAR(255)</span></div>
+                        <div class="col-item"><span>phone_number</span> <span>VARCHAR(20)</span></div>
+                        <div class="col-item"><span>role</span> <span>ENUM('STUDENT','TEACHER','ADMIN')</span></div>
+                        <div class="col-item"><span>account_status</span> <span>VARCHAR(20)</span></div>
+                        <div class="col-item"><span>created_at / updated_at</span> <span>DATETIME</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. students -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card table-card">
+                    <div class="card-header card-header-table bg-primary text-white"><i class="fas fa-user-graduate me-2"></i> students</div>
+                    <div class="card-body p-0">
+                        <div class="col-item"><span class="fw-bold text-primary"><span class="badge badge-pk me-1">PK</span> student_id</span> <span>BIGINT (AI)</span></div>
+                        <div class="col-item"><span class="text-danger"><span class="badge badge-fk me-1">FK</span> user_id</span> <span>BIGINT UNIQUE</span></div>
+                        <div class="col-item"><span>roll_number</span> <span class="badge bg-secondary">UNIQUE</span></div>
+                        <div class="col-item"><span>department</span> <span>VARCHAR(100)</span></div>
+                        <div class="col-item"><span>academic_year / semester</span> <span>INT / INT</span></div>
+                        <div class="col-item"><span>student_type</span> <span>DAY_SCHOLAR / HOSTEL</span></div>
+                        <div class="col-item"><span>hostel_name</span> <span>VARCHAR(100) NULL</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. teachers -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card table-card">
+                    <div class="card-header card-header-table bg-primary text-white"><i class="fas fa-chalkboard-teacher me-2"></i> teachers</div>
+                    <div class="card-body p-0">
+                        <div class="col-item"><span class="fw-bold text-primary"><span class="badge badge-pk me-1">PK</span> teacher_id</span> <span>BIGINT (AI)</span></div>
+                        <div class="col-item"><span class="text-danger"><span class="badge badge-fk me-1">FK</span> user_id</span> <span>BIGINT UNIQUE</span></div>
+                        <div class="col-item"><span>employee_id</span> <span class="badge bg-secondary">UNIQUE</span></div>
+                        <div class="col-item"><span>department</span> <span>VARCHAR(100)</span></div>
+                        <div class="col-item"><span>designation</span> <span>VARCHAR(100)</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. buses -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card table-card">
+                    <div class="card-header card-header-table bg-success text-white"><i class="fas fa-bus me-2"></i> buses</div>
+                    <div class="card-body p-0">
+                        <div class="col-item"><span class="fw-bold text-primary"><span class="badge badge-pk me-1">PK</span> bus_id</span> <span>BIGINT (AI)</span></div>
+                        <div class="col-item"><span>bus_number</span> <span class="badge bg-secondary">UNIQUE</span></div>
+                        <div class="col-item"><span>registration_number</span> <span class="badge bg-secondary">UNIQUE</span></div>
+                        <div class="col-item"><span>total_seats</span> <span>INT NOT NULL</span></div>
+                        <div class="col-item"><span>bus_type</span> <span>VARCHAR(30)</span></div>
+                        <div class="col-item"><span>bus_status</span> <span>ACTIVE / MAINT / INACTIVE</span></div>
+                        <div class="col-item"><span>created_at</span> <span>DATETIME</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. drivers -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card table-card">
+                    <div class="card-header card-header-table bg-success text-white"><i class="fas fa-id-card me-2"></i> drivers</div>
+                    <div class="card-body p-0">
+                        <div class="col-item"><span class="fw-bold text-primary"><span class="badge badge-pk me-1">PK</span> driver_id</span> <span>BIGINT (AI)</span></div>
+                        <div class="col-item"><span>driver_name</span> <span>VARCHAR(100)</span></div>
+                        <div class="col-item"><span>phone_number</span> <span>VARCHAR(20)</span></div>
+                        <div class="col-item"><span>license_number</span> <span class="badge bg-secondary">UNIQUE</span></div>
+                        <div class="col-item"><span>driver_status</span> <span>ACTIVE / ON_LEAVE</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. routes -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card table-card">
+                    <div class="card-header card-header-table bg-info text-dark"><i class="fas fa-route me-2"></i> routes</div>
+                    <div class="card-body p-0">
+                        <div class="col-item"><span class="fw-bold text-primary"><span class="badge badge-pk me-1">PK</span> route_id</span> <span>BIGINT (AI)</span></div>
+                        <div class="col-item"><span>route_name</span> <span>VARCHAR(100)</span></div>
+                        <div class="col-item"><span>source</span> <span>VARCHAR(100)</span></div>
+                        <div class="col-item"><span>destination</span> <span>VARCHAR(100)</span></div>
+                        <div class="col-item"><span>route_description</span> <span>TEXT</span></div>
+                        <div class="col-item"><span>route_status</span> <span>VARCHAR(30)</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. bus_stops -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card table-card">
+                    <div class="card-header card-header-table bg-info text-dark"><i class="fas fa-map-marker-alt me-2"></i> bus_stops</div>
+                    <div class="card-body p-0">
+                        <div class="col-item"><span class="fw-bold text-primary"><span class="badge badge-pk me-1">PK</span> stop_id</span> <span>BIGINT (AI)</span></div>
+                        <div class="col-item"><span>stop_name</span> <span>VARCHAR(100)</span></div>
+                        <div class="col-item"><span>location_description</span> <span>VARCHAR(255)</span></div>
+                        <div class="col-item"><span>area</span> <span>VARCHAR(100)</span></div>
+                        <div class="col-item"><span>stop_status</span> <span>VARCHAR(30)</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8. route_stops -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card table-card">
+                    <div class="card-header card-header-table bg-info text-dark"><i class="fas fa-network-wired me-2"></i> route_stops</div>
+                    <div class="card-body p-0">
+                        <div class="col-item"><span class="fw-bold text-primary"><span class="badge badge-pk me-1">PK</span> route_stop_id</span> <span>BIGINT (AI)</span></div>
+                        <div class="col-item"><span class="text-danger"><span class="badge badge-fk me-1">FK</span> route_id</span> <span>BIGINT</span></div>
+                        <div class="col-item"><span class="text-danger"><span class="badge badge-fk me-1">FK</span> stop_id</span> <span>BIGINT</span></div>
+                        <div class="col-item"><span>stop_sequence</span> <span>INT (1, 2, 3...)</span></div>
+                        <div class="col-item"><span>estimated_travel_minutes</span> <span>INT</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 9. trips -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card table-card">
+                    <div class="card-header card-header-table bg-warning text-dark"><i class="fas fa-calendar-day me-2"></i> trips</div>
+                    <div class="card-body p-0">
+                        <div class="col-item"><span class="fw-bold text-primary"><span class="badge badge-pk me-1">PK</span> trip_id</span> <span>BIGINT (AI)</span></div>
+                        <div class="col-item"><span class="text-danger"><span class="badge badge-fk me-1">FK</span> bus_id</span> <span>BIGINT</span></div>
+                        <div class="col-item"><span class="text-danger"><span class="badge badge-fk me-1">FK</span> route_id</span> <span>BIGINT</span></div>
+                        <div class="col-item"><span class="text-danger"><span class="badge badge-fk me-1">FK</span> driver_id</span> <span>BIGINT</span></div>
+                        <div class="col-item"><span>travel_date</span> <span>DATE NOT NULL</span></div>
+                        <div class="col-item"><span>departure_time / arrival_time</span> <span>TIME / TIME</span></div>
+                        <div class="col-item"><span>trip_type / trip_status</span> <span>REGULAR / SCHEDULED</span></div>
+                        <div class="col-item"><span>booking_cutoff_time</span> <span>TIME NOT NULL</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 10. bookings -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card table-card">
+                    <div class="card-header card-header-table bg-danger text-white"><i class="fas fa-ticket-alt me-2"></i> bookings</div>
+                    <div class="card-body p-0">
+                        <div class="col-item"><span class="fw-bold text-primary"><span class="badge badge-pk me-1">PK</span> booking_id</span> <span>BIGINT (AI)</span></div>
+                        <div class="col-item"><span class="text-danger"><span class="badge badge-fk me-1">FK</span> user_id</span> <span>BIGINT</span></div>
+                        <div class="col-item"><span class="text-danger"><span class="badge badge-fk me-1">FK</span> trip_id</span> <span>BIGINT</span></div>
+                        <div class="col-item"><span class="text-danger"><span class="badge badge-fk me-1">FK</span> pickup_stop_id</span> <span>BIGINT</span></div>
+                        <div class="col-item"><span class="text-danger"><span class="badge badge-fk me-1">FK</span> dropoff_stop_id</span> <span>BIGINT</span></div>
+                        <div class="col-item"><span>booking_status</span> <span>CONFIRMED / CANCELLED</span></div>
+                        <div class="col-item"><span>booking_date</span> <span>DATETIME</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 11. seat_requests -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card table-card">
+                    <div class="card-header card-header-table bg-danger text-white"><i class="fas fa-hand-paper me-2"></i> seat_requests</div>
+                    <div class="card-body p-0">
+                        <div class="col-item"><span class="fw-bold text-primary"><span class="badge badge-pk me-1">PK</span> request_id</span> <span>BIGINT (AI)</span></div>
+                        <div class="col-item"><span class="text-danger"><span class="badge badge-fk me-1">FK</span> user_id</span> <span>BIGINT</span></div>
+                        <div class="col-item"><span class="text-danger"><span class="badge badge-fk me-1">FK</span> trip_id</span> <span>BIGINT</span></div>
+                        <div class="col-item"><span class="text-danger"><span class="badge badge-fk me-1">FK</span> pickup_stop_id</span> <span>BIGINT</span></div>
+                        <div class="col-item"><span class="text-danger"><span class="badge badge-fk me-1">FK</span> dropoff_stop_id</span> <span>BIGINT</span></div>
+                        <div class="col-item"><span>request_status</span> <span>PENDING/APPROVED/REJECTED</span></div>
+                        <div class="col-item"><span class="text-danger"><span class="badge badge-fk me-1">FK</span> processed_by</span> <span>BIGINT (Admin)</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 12. academic_timetable -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card table-card">
+                    <div class="card-header card-header-table bg-secondary text-white"><i class="fas fa-calendar-alt me-2"></i> academic_timetable</div>
+                    <div class="card-body p-0">
+                        <div class="col-item"><span class="fw-bold text-primary"><span class="badge badge-pk me-1">PK</span> timetable_id</span> <span>BIGINT (AI)</span></div>
+                        <div class="col-item"><span>department</span> <span>VARCHAR(100)</span></div>
+                        <div class="col-item"><span>academic_year / semester</span> <span>INT / INT</span></div>
+                        <div class="col-item"><span>day_of_week</span> <span>VARCHAR(20)</span></div>
+                        <div class="col-item"><span>start_time / end_time</span> <span>TIME / TIME</span></div>
+                        <div class="col-item"><span>subject_name</span> <span>VARCHAR(150)</span></div>
+                        <div class="col-item"><span>timetable_status</span> <span>VARCHAR(30)</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 13. exam_timetable -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card table-card">
+                    <div class="card-header card-header-table bg-dark text-white"><i class="fas fa-file-signature me-2"></i> exam_timetable</div>
+                    <div class="card-body p-0">
+                        <div class="col-item"><span class="fw-bold text-primary"><span class="badge badge-pk me-1">PK</span> exam_id</span> <span>BIGINT (AI)</span></div>
+                        <div class="col-item"><span>department</span> <span>VARCHAR(100)</span></div>
+                        <div class="col-item"><span>academic_year / semester</span> <span>INT / INT</span></div>
+                        <div class="col-item"><span>subject_name</span> <span>VARCHAR(150)</span></div>
+                        <div class="col-item"><span>exam_date</span> <span>DATE</span></div>
+                        <div class="col-item"><span>exam_start_time / end_time</span> <span>TIME / TIME</span></div>
+                        <div class="col-item"><span>exam_type</span> <span>VARCHAR(50)</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4 border-0 shadow-sm">
+            <h4 class="fw-bold mb-3"><i class="fas fa-project-diagram text-primary me-2"></i> Architectural Relational Mappings</h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="rel-card"><strong>users (1) &mdash; (1) students</strong>: One-to-One linked by user_id FK (UNIQUE)</div>
+                    <div class="rel-card"><strong>users (1) &mdash; (1) teachers</strong>: One-to-One linked by user_id FK (UNIQUE)</div>
+                    <div class="rel-card"><strong>users (1) &mdash; (N) bookings</strong>: User can hold multiple trip bookings</div>
+                    <div class="rel-card"><strong>buses (1) &mdash; (N) trips</strong>: A physical vehicle is assigned to multiple trips</div>
+                    <div class="rel-card"><strong>routes (1) &mdash; (N) trips</strong>: A fixed route is scheduled across daily time slots</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="rel-card"><strong>drivers (1) &mdash; (N) trips</strong>: A certified driver operates allocated trips</div>
+                    <div class="rel-card"><strong>routes (1) &mdash; (N) route_stops &mdash; (1) bus_stops</strong>: Many-to-Many resolved by junction table with ordered sequence</div>
+                    <div class="rel-card"><strong>trips (1) &mdash; (N) bookings</strong>: Passengers reserve seats on a specific trip</div>
+                    <div class="rel-card"><strong>trips (1) &mdash; (N) seat_requests</strong>: Overflow passengers submit requests for admin review</div>
+                    <div class="rel-card"><strong>exam_timetable &rarr; trips</strong>: Recommendation engine pairs exam_end_time with upcoming departure trips</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

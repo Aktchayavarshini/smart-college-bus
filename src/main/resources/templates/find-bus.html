@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Matching Buses')}"></head>
+<body>
+<div th:replace="~{fragments/header :: navbar}"></div>
+
+<main class="py-4">
+    <div class="container">
+        <!-- Search Criteria Bar -->
+        <div class="custom-card p-3 mb-4 bg-white shadow-sm border-primary">
+            <form th:action="@{/find-bus}" method="get" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-primary mb-1">Travel Date</label>
+                    <input type="date" name="travelDate" class="form-control form-control-sm" th:value="${searchDto.travelDate}" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-primary mb-1">Time Slot</label>
+                    <select name="preferredTimeSlot" class="form-select form-select-sm" required>
+                        <option value="06:00" th:selected="${searchDto.preferredTimeSlot == '06:00'}">06:00 AM</option>
+                        <option value="07:00" th:selected="${searchDto.preferredTimeSlot == '07:00'}">07:00 AM</option>
+                        <option value="08:00" th:selected="${searchDto.preferredTimeSlot == '08:00'}">08:00 AM</option>
+                        <option value="09:00" th:selected="${searchDto.preferredTimeSlot == '09:00'}">09:00 AM</option>
+                        <option value="12:00" th:selected="${searchDto.preferredTimeSlot == '12:00'}">12:00 PM</option>
+                        <option value="15:00" th:selected="${searchDto.preferredTimeSlot == '15:00'}">03:00 PM</option>
+                        <option value="17:00" th:selected="${searchDto.preferredTimeSlot == '17:00'}">05:00 PM</option>
+                        <option value="ALL" th:selected="${searchDto.preferredTimeSlot == 'ALL'}">All Slots</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-primary mb-1">Pickup Stop (Flexible)</label>
+                    <select name="pickupStopId" class="form-select form-select-sm">
+                        <option value="">-- Any Pickup Stop --</option>
+                        <option th:each="s : ${stops}" th:value="${s.stopId}" th:text="${s.stopName} + ' (' + ${s.area} + ')'"
+                                th:selected="${searchDto.pickupStopId != null && searchDto.pickupStopId == s.stopId}"></option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-primary mb-1">Destination Stop</label>
+                    <select name="dropoffStopId" class="form-select form-select-sm">
+                        <option value="">-- Any Destination Stop --</option>
+                        <option th:each="s : ${stops}" th:value="${s.stopId}" th:text="${s.stopName} + ' (' + ${s.area} + ')'"
+                                th:selected="${searchDto.dropoffStopId != null && searchDto.dropoffStopId == s.stopId}"></option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-sm btn-primary-custom w-100">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <!-- Matching Buses Count Header -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h4 class="fw-bold text-primary mb-0">
+                    <i class="fas fa-bus-alt me-2"></i> Matching Scheduled Buses
+                </h4>
+                <small class="text-muted">
+                    Found <strong th:text="${trips != null ? trips.size() : 0}">0</strong> trips for
+                    <span th:text="${searchDto.travelDate}">2026-11-03</span> | Slot: <strong th:text="${searchDto.preferredTimeSlot}">07:00</strong>
+                </small>
+            </div>
+            <div>
+                <a th:href="@{/calendar}" class="btn btn-sm btn-outline-secondary rounded-pill">
+                    <i class="fas fa-calendar-alt me-1"></i> Change Date
+                </a>
+            </div>
+        </div>
+
+        <!-- No Buses Found Warning -->
+        <div th:if="${trips == null || trips.isEmpty()}" class="custom-card p-5 text-center shadow-sm">
+            <i class="fas fa-bus-alt fs-1 text-muted mb-3 opacity-50"></i>
+            <h5 class="fw-bold text-secondary">No Matching Trips Found</h5>
+            <p class="text-muted small max-w-md mx-auto mb-4">
+                No scheduled buses match your selected pickup, destination, and departure time window.
+                Try selecting "All Slots", choosing a different pickup stop, or asking Aadhi for alternative routes!
+            </p>
+            <div class="d-flex justify-content-center gap-3">
+                <a th:href="@{/find-bus(travelDate=${searchDto.travelDate}, preferredTimeSlot='ALL')}" class="btn btn-primary-custom rounded-pill">
+                    View All Trips Today
+                </a>
+                <a th:href="@{/talk-to-aadhi}" class="btn btn-outline-custom rounded-pill">
+                    <i class="fas fa-robot me-1"></i> Ask Aadhi for Alternatives
+                </a>
+            </div>
+        </div>
+
+        <!-- Bus Cards Grid -->
+        <div class="row g-4" th:if="${trips != null && !trips.isEmpty()}">
+            <div class="col-lg-6" th:each="t : ${trips}">
+                <div class="bus-card h-100 d-flex flex-column justify-content-between"
+                     th:classappend="${t.full ? 'bus-full' : 'bus-available'}">
+                    <div>
+                        <!-- Header: Bus Number & Status -->
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <span class="badge bg-primary fs-6 me-2" th:text="${t.busNumber}">BUS-101</span>
+                                <span class="badge bg-light text-dark border" th:text="${t.registrationNumber}">TN-09-CB-1001</span>
+                                <span class="badge bg-info-subtle text-info fw-bold ms-1" th:text="${t.tripType}">REGULAR</span>
+                            </div>
+
+                            <!-- Seat Indicator -->
+                            <div>
+                                <span th:if="${t.availableSeats > 5}" class="seat-indicator seat-avail">
+                                    <i class="fas fa-chair"></i> <span th:text="${t.availableSeats}">45</span> Seats Left
+                                </span>
+                                <span th:if="${t.availableSeats > 0 && t.availableSeats <= 5}" class="seat-indicator seat-low">
+                                    <i class="fas fa-exclamation-circle"></i> Only <span th:text="${t.availableSeats}">2</span> Left!
+                                </span>
+                                <span th:if="${t.availableSeats <= 0}" class="seat-indicator seat-empty">
+                                    <i class="fas fa-times-circle"></i> BUS FULL
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Route Information -->
+                        <h5 class="fw-bold text-dark mt-2 mb-1" th:text="${t.routeName}">Pallavaram Express</h5>
+                        <div class="small text-muted mb-3">
+                            <i class="fas fa-map-marker-alt text-primary me-1"></i>
+                            <span th:text="${t.source}">Pallavaram</span> ➔ <span th:text="${t.destination}">College Main Campus</span>
+                        </div>
+
+                        <!-- Timing & Details Grid -->
+                        <div class="row g-2 p-2 bg-light rounded-3 small mb-3">
+                            <div class="col-6">
+                                <span class="text-muted">Departure:</span> <strong class="text-dark" th:text="${t.departureTime}">07:00 AM</strong>
+                            </div>
+                            <div class="col-6" th:if="${t.arrivalTime != null}">
+                                <span class="text-muted">Arrival:</span> <strong class="text-dark" th:text="${t.arrivalTime}">07:55 AM</strong>
+                            </div>
+                            <div class="col-6">
+                                <span class="text-muted">Capacity:</span> <span th:text="${t.bookedSeats}">5</span> / <span th:text="${t.totalSeats}">50</span> Booked
+                            </div>
+                            <div class="col-6" th:if="${t.driverName != null}">
+                                <span class="text-muted">Driver:</span> <strong class="text-dark" th:text="${t.driverName}">R. Murugan</strong>
+                            </div>
+                            <div class="col-12" th:if="${t.estimatedTravelMinutes != null && t.estimatedTravelMinutes > 0}">
+                                <span class="text-muted">Estimated Transit Duration:</span>
+                                <strong class="text-primary" th:text="${t.estimatedTravelMinutes} + ' mins'">35 mins</strong>
+                            </div>
+                        </div>
+
+                        <!-- Full Bus Warning & Alternatives Callout -->
+                        <div th:if="${t.full}" class="alert alert-danger py-2 px-3 small rounded-3 mb-3">
+                            <div class="fw-bold mb-1"><i class="fas fa-ban me-1"></i> No seats remaining on this trip.</div>
+                            <div>You can submit a <strong>Seat Request</strong> for administrator waitlist review or explore alternative departure timings.</div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="pt-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2 mt-2">
+                        <a th:href="@{/bus-details/{id}(id=${t.tripId}, pickup=${searchDto.pickupStopId}, dropoff=${searchDto.dropoffStopId})}"
+                           class="btn btn-sm btn-outline-secondary rounded-pill">
+                            <i class="fas fa-info-circle me-1"></i> View Route Stops
+                        </a>
+
+                        <div>
+                            <!-- Available -> Book Seat -->
+                            <a th:if="${!t.full}"
+                               th:href="@{/booking/confirm(tripId=${t.tripId}, pickupStopId=${searchDto.pickupStopId != null ? searchDto.pickupStopId : 2}, dropoffStopId=${searchDto.dropoffStopId != null ? searchDto.dropoffStopId : 1})}"
+                               class="btn btn-sm btn-primary-custom rounded-pill px-4">
+                                <i class="fas fa-ticket-alt me-1"></i> Book Seat
+                            </a>
+
+                            <!-- Full -> Request Seat Modal Trigger -->
+                            <button th:if="${t.full}" type="button" class="btn btn-sm btn-warning rounded-pill px-3"
+                                    data-bs-toggle="modal" th:data-bs-target="'#requestModal-' + ${t.tripId}">
+                                <i class="fas fa-hand-paper me-1"></i> Request a Seat
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Request Seat Modal -->
+                <div th:if="${t.full}" class="modal fade" th:id="'requestModal-' + ${t.tripId}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content rounded-4 border-0 shadow">
+                            <div class="modal-header bg-warning bg-opacity-25 border-0">
+                                <h5 class="modal-title fw-bold text-dark"><i class="fas fa-hand-paper me-2"></i> Request Seat Overflow</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form th:action="@{/seat-request/new}" method="post">
+                                <input type="hidden" name="tripId" th:value="${t.tripId}"/>
+                                <div class="modal-body">
+                                    <p class="small text-muted mb-3">
+                                        Bus <strong th:text="${t.busNumber}">BUS-101</strong> on <span th:text="${t.travelDate}">2026-11-03</span> is currently full.
+                                        Submitting this request places you in the administrative overflow queue. If a cancellation occurs or an additional bus is deployed, the administrator can approve your reservation.
+                                    </p>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold">Pickup Stop</label>
+                                        <select name="pickupStopId" class="form-select form-select-sm" required>
+                                            <option th:each="s : ${stops}" th:value="${s.stopId}" th:text="${s.stopName}"
+                                                    th:selected="${searchDto.pickupStopId != null && searchDto.pickupStopId == s.stopId}"></option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold">Dropoff Stop</label>
+                                        <select name="dropoffStopId" class="form-select form-select-sm" required>
+                                            <option th:each="s : ${stops}" th:value="${s.stopId}" th:text="${s.stopName}"
+                                                    th:selected="${searchDto.dropoffStopId != null && searchDto.dropoffStopId == s.stopId}"></option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-footer border-0">
+                                    <button type="button" class="btn btn-sm btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-sm btn-warning fw-bold rounded-pill px-4">Submit Seat Request</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/aadhi-widget :: aadhiWidget}"></div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Trip Management - Admin')}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments/header :: navbar}"></div>
+
+<main class="py-4">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <a th:href="@{/admin/dashboard}" class="text-decoration-none small text-muted"><i class="fas fa-arrow-left me-1"></i> Admin Dashboard</a>
+                <h3 class="fw-bold text-primary mb-1"><i class="fas fa-calendar-day me-2"></i> Trip Dispatch Management</h3>
+                <p class="text-muted small mb-0">Schedule campus transit journeys: allocate vehicle, assign certified driver, set route timings & cutoff rules</p>
+            </div>
+            <button type="button" class="btn btn-primary-custom rounded-pill" data-bs-toggle="modal" data-bs-target="#scheduleTripModal">
+                <i class="fas fa-plus me-1"></i> Schedule New Trip
+            </button>
+        </div>
+
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <div class="custom-card shadow-sm overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Trip ID</th>
+                            <th>Travel Date</th>
+                            <th>Bus Allocated</th>
+                            <th>Route</th>
+                            <th>Departure / Cutoff</th>
+                            <th>Driver Assigned</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="t : ${trips}">
+                            <td class="fw-bold" th:text="'#' + ${t.tripId}">#1</td>
+                            <td><strong class="text-dark" th:text="${t.travelDate}">2026-11-03</strong></td>
+                            <td>
+                                <span class="badge bg-primary" th:text="${t.bus.busNumber}">BUS-101</span>
+                                <div class="small text-muted" th:text="${t.bus.totalSeats} + ' Seats'">50 Seats</div>
+                            </td>
+                            <td>
+                                <strong class="text-dark" th:text="${t.route.routeName}">Route 101</strong>
+                                <div class="small text-muted" th:text="${t.route.source} + ' ➔ ' + ${t.route.destination}">Pallavaram ➔ Campus</div>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-primary" th:text="${t.departureTime}">07:00 AM</div>
+                                <div class="small text-danger">Cutoff: <span th:text="${t.bookingCutoffTime}">06:30 AM</span></div>
+                            </td>
+                            <td>
+                                <div class="fw-bold" th:text="${t.driver.driverName}">R. Murugan</div>
+                                <div class="small text-muted" th:text="${t.driver.phoneNumber}">9840112233</div>
+                            </td>
+                            <td>
+                                <span class="badge bg-info-subtle text-info fw-bold" th:text="${t.tripType}">REGULAR</span>
+                            </td>
+                            <td>
+                                <span th:if="${t.tripStatus == 'SCHEDULED'}" class="badge bg-success">SCHEDULED</span>
+                                <span th:if="${t.tripStatus == 'CANCELLED'}" class="badge bg-danger">CANCELLED</span>
+                                <span th:if="${t.tripStatus == 'COMPLETED'}" class="badge bg-secondary">COMPLETED</span>
+                            </td>
+                            <td>
+                                <form th:if="${t.tripStatus == 'SCHEDULED'}" th:action="@{/admin/trips/cancel/{id}(id=${t.tripId})}" method="post" onsubmit="return confirm('Cancel this scheduled trip?');">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill" title="Cancel Trip">
+                                        <i class="fas fa-ban me-1"></i> Cancel
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Schedule Trip Modal -->
+        <div class="modal fade" id="scheduleTripModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content rounded-4 border-0 shadow">
+                    <div class="modal-header bg-primary text-white border-0">
+                        <h5 class="modal-title fw-bold">Schedule New Campus Trip</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form th:action="@{/admin/trips/create}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                        <div class="modal-body">
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Select Bus Fleet Vehicle</label>
+                                    <select name="busId" class="form-select" required>
+                                        <option th:each="b : ${buses}" th:value="${b.busId}" th:text="${b.busNumber} + ' (' + ${b.busType} + ', ' + ${b.totalSeats} + ' Seats)'"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Select Active Route</label>
+                                    <select name="routeId" class="form-select" required>
+                                        <option th:each="r : ${routes}" th:value="${r.routeId}" th:text="${r.routeName} + ' (' + ${r.source} + ' ➔ ' + ${r.destination} + ')'"></option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Assign Certified Driver</label>
+                                    <select name="driverId" class="form-select" required>
+                                        <option th:each="d : ${drivers}" th:value="${d.driverId}" th:text="${d.driverName} + ' (' + ${d.phoneNumber} + ')'"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Travel Date</label>
+                                    <input type="date" name="travelDate" class="form-control" required th:min="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Departure Time (HH:mm)</label>
+                                    <input type="time" name="departureTime" class="form-control" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Arrival Time (Optional)</label>
+                                    <input type="time" name="arrivalTime" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Booking Cutoff Time</label>
+                                    <input type="time" name="cutoffTime" class="form-control" placeholder="30 mins before departure">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Trip Type</label>
+                                <select name="tripType" class="form-select">
+                                    <option value="REGULAR" selected>REGULAR (Daily Academic Transit)</option>
+                                    <option value="EXAM_SPECIAL">EXAM_SPECIAL (Midday Return Dispatch)</option>
+                                    <option value="EVENING">EVENING (Campus Return Service)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0">
+                            <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary-custom rounded-pill">Dispatch Trip</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

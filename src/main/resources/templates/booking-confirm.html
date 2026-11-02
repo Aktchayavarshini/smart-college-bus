@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Review & Confirm Booking')}"></head>
+<body>
+<div th:replace="~{fragments/header :: navbar}"></div>
+
+<main class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="text-center mb-4">
+                    <span class="badge bg-success-subtle text-success fw-bold px-3 py-1 rounded-pill">FINAL STEP</span>
+                    <h2 class="fw-bold text-primary mt-1">Review & Confirm Booking</h2>
+                    <p class="text-muted">Verify your journey itinerary before confirming your seat reservation</p>
+                </div>
+
+                <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+                <div class="custom-card p-4 p-md-5 shadow-lg">
+                    <!-- Ticket Header -->
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+                        <div>
+                            <span class="badge bg-primary fs-6" th:text="${trip.busNumber}">BUS-101</span>
+                            <span class="badge bg-light text-dark border ms-2" th:text="${trip.registrationNumber}">TN-09-CB-1001</span>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-success px-3 py-2">CONFIRMATION READY</span>
+                        </div>
+                    </div>
+
+                    <!-- Passenger Details -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-secondary text-uppercase small">Passenger Profile</h6>
+                        <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="fw-bold text-dark mb-0" th:text="${currentUser.fullName}">Student Name</h5>
+                                <div class="small text-muted" th:text="${currentUser.email}">student@collegebus.edu</div>
+                            </div>
+                            <span class="badge badge-role"
+                                  th:classappend="${currentUser.role == 'TEACHER' ? 'badge-teacher' : 'badge-student'}"
+                                  th:text="${currentUser.role}">STUDENT</span>
+                        </div>
+                    </div>
+
+                    <!-- Journey Details -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-secondary text-uppercase small">Travel Itinerary</h6>
+                        <div class="p-3 border rounded-3">
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <div class="text-muted small">Travel Date</div>
+                                    <div class="fw-bold fs-6 text-primary" th:text="${trip.travelDate}">2026-11-03</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="text-muted small">Departure Time</div>
+                                    <div class="fw-bold fs-6 text-primary" th:text="${trip.departureTime}">07:00 AM</div>
+                                </div>
+                                <div class="col-12"><hr class="my-1"></div>
+                                <div class="col-sm-6">
+                                    <div class="text-muted small"><i class="fas fa-map-marker-alt text-success me-1"></i> Pickup Stop</div>
+                                    <div class="fw-bold text-dark" th:text="${pickup.stopName}">Pallavaram Bus Stand</div>
+                                    <div class="small text-muted" th:text="${pickup.area}">Pallavaram</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="text-muted small"><i class="fas fa-flag-checkered text-danger me-1"></i> Destination Stop</div>
+                                    <div class="fw-bold text-dark" th:text="${dropoff.stopName}">College Main Campus</div>
+                                    <div class="small text-muted" th:text="${dropoff.area}">Avadi Campus</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Important Notice -->
+                    <div class="p-3 bg-info bg-opacity-10 border border-info border-opacity-25 rounded-3 small text-muted mb-4">
+                        <i class="fas fa-info-circle text-info me-1"></i>
+                        <strong>Booking Policy:</strong> Only one confirmed reservation is allowed per user for this travel slot.
+                        Cancellation is allowed anytime before cutoff (<span th:text="${trip.bookingCutoffTime}">06:30 AM</span>).
+                    </div>
+
+                    <!-- Form submission -->
+                    <form th:action="@{/booking/create}" method="post">
+                        <!-- CSRF Token -->
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                        <input type="hidden" name="tripId" th:value="${bookingRequest.tripId}"/>
+                        <input type="hidden" name="pickupStopId" th:value="${bookingRequest.pickupStopId}"/>
+                        <input type="hidden" name="dropoffStopId" th:value="${bookingRequest.dropoffStopId}"/>
+                        <input type="hidden" name="requestedPickupText" th:value="${pickup.stopName}"/>
+                        <input type="hidden" name="requestedDestinationText" th:value="${dropoff.stopName}"/>
+
+                        <div class="d-flex justify-content-between gap-3">
+                            <a th:href="@{/find-bus(travelDate=${trip.travelDate}, preferredTimeSlot='ALL')}" class="btn btn-outline-secondary rounded-pill px-4">
+                                <i class="fas fa-arrow-left me-1"></i> Back
+                            </a>
+                            <button type="submit" class="btn btn-primary-custom rounded-pill px-5 py-2 fs-6">
+                                <i class="fas fa-check-circle me-1"></i> Confirm & Reserve Seat
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/aadhi-widget :: aadhiWidget}"></div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Academic Timetable')}"></head>
+<body>
+<div th:replace="~{fragments/header :: navbar}"></div>
+
+<main class="py-4">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h3 class="fw-bold text-primary mb-1"><i class="fas fa-calendar-alt me-2"></i> Academic Timetable</h3>
+                <p class="text-muted small mb-0">Department class schedules integrated with bus transit scheduling</p>
+            </div>
+            <div>
+                <a th:href="@{/exam-timetable}" class="btn btn-sm btn-outline-info rounded-pill">
+                    <i class="fas fa-graduation-cap me-1"></i> View Exam Timetable & Return Buses
+                </a>
+            </div>
+        </div>
+
+        <!-- Filter Form -->
+        <div class="custom-card p-3 mb-4 bg-light">
+            <form th:action="@{/academic-timetable}" method="get" class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label small fw-bold">Department</label>
+                    <select name="department" class="form-select form-select-sm">
+                        <option value="Computer Science and Engineering" th:selected="${selectedDept == 'Computer Science and Engineering'}">Computer Science and Engineering</option>
+                        <option value="Information Technology" th:selected="${selectedDept == 'Information Technology'}">Information Technology</option>
+                        <option value="Electronics and Communication Engineering" th:selected="${selectedDept == 'Electronics and Communication Engineering'}">Electronics and Communication Engineering</option>
+                        <option value="Mechanical Engineering" th:selected="${selectedDept == 'Mechanical Engineering'}">Mechanical Engineering</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Academic Year</label>
+                    <select name="year" class="form-select form-select-sm">
+                        <option value="1" th:selected="${selectedYear == 1}">1st Year</option>
+                        <option value="2" th:selected="${selectedYear == 2}">2nd Year</option>
+                        <option value="3" th:selected="${selectedYear == null || selectedYear == 3}">3rd Year</option>
+                        <option value="4" th:selected="${selectedYear == 4}">4th Year</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold">Semester</label>
+                    <select name="semester" class="form-select form-select-sm">
+                        <option value="1" th:selected="${selectedSem == 1}">Sem 1</option>
+                        <option value="3" th:selected="${selectedSem == 3}">Sem 3</option>
+                        <option value="5" th:selected="${selectedSem == null || selectedSem == 5}">Sem 5</option>
+                        <option value="7" th:selected="${selectedSem == 7}">Sem 7</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-sm btn-primary-custom w-100">
+                        <i class="fas fa-search me-1"></i> Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <!-- Schedule Table -->
+        <div class="custom-card shadow-sm overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Day</th>
+                            <th>Class Timings</th>
+                            <th>Subject / Course</th>
+                            <th>Department</th>
+                            <th>Semester</th>
+                            <th>Bus Transit Link</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${timetables == null || timetables.isEmpty()}">
+                            <td colspan="6" class="text-center py-4 text-muted">No academic timetable records found for the selected department.</td>
+                        </tr>
+                        <tr th:each="t : ${timetables}">
+                            <td>
+                                <span class="badge bg-primary text-uppercase" th:text="${t.dayOfWeek}">MONDAY</span>
+                            </td>
+                            <td>
+                                <strong class="text-dark" th:text="${t.startTime} + ' - ' + ${t.endTime}">08:45:00 - 09:45:00</strong>
+                            </td>
+                            <td>
+                                <span class="fw-bold text-primary" th:text="${t.subjectName}">Compiler Design</span>
+                            </td>
+                            <td class="small text-muted" th:text="${t.department}">Computer Science and Engineering</td>
+                            <td>Semester <span th:text="${t.semester}">5</span></td>
+                            <td>
+                                <a th:href="@{/find-bus(travelDate='2026-11-03', preferredTimeSlot='07:00')}" class="btn btn-sm btn-outline-primary rounded-pill">
+                                    <i class="fas fa-bus small me-1"></i> Matching 7 AM Bus
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/aadhi-widget :: aadhiWidget}"></div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

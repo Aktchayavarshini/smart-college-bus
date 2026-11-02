@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Bus & Trip Details')}"></head>
+<body>
+<div th:replace="~{fragments/header :: navbar}"></div>
+
+<main class="py-4">
+    <div class="container">
+        <!-- Navigation Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/calendar}">Calendar</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/find-bus(travelDate=${trip.travelDate}, preferredTimeSlot='ALL')}">Matching Buses</a></li>
+                <li class="breadcrumb-item active" aria-current="page" th:text="${trip.busNumber}">BUS-101</li>
+            </ol>
+        </nav>
+
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <div class="row g-4">
+            <!-- Left: Bus Details & Stops Timeline -->
+            <div class="col-lg-8">
+                <!-- Trip Summary Card -->
+                <div class="custom-card p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                        <div>
+                            <span class="badge bg-primary fs-6 me-2" th:text="${trip.busNumber}">BUS-101</span>
+                            <span class="badge bg-light text-dark border" th:text="${trip.registrationNumber}">TN-09-CB-1001</span>
+                            <span class="badge bg-info-subtle text-info fw-bold ms-1" th:text="${trip.tripType}">REGULAR</span>
+                        </div>
+                        <div>
+                            <span th:if="${trip.availableSeats > 5}" class="seat-indicator seat-avail">
+                                <i class="fas fa-chair"></i> <span th:text="${trip.availableSeats}">45</span> Seats Available
+                            </span>
+                            <span th:if="${trip.availableSeats <= 0}" class="seat-indicator seat-empty">
+                                <i class="fas fa-ban"></i> BUS FULL
+                            </span>
+                        </div>
+                    </div>
+
+                    <h3 class="fw-bold text-dark mb-1" th:text="${trip.routeName}">Route 101 - Pallavaram Express</h3>
+                    <p class="text-muted small mb-3">
+                        <i class="fas fa-route text-primary me-1"></i> From <strong th:text="${trip.source}">Pallavaram</strong> to <strong th:text="${trip.destination}">College Campus</strong>
+                    </p>
+
+                    <div class="row g-3 p-3 bg-light rounded-3 mb-4">
+                        <div class="col-sm-4">
+                            <div class="text-muted small">Travel Date</div>
+                            <div class="fw-bold text-dark" th:text="${trip.travelDate}">2026-11-03</div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="text-muted small">Departure Time</div>
+                            <div class="fw-bold text-dark" th:text="${trip.departureTime}">07:00 AM</div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="text-muted small">Expected Arrival</div>
+                            <div class="fw-bold text-dark" th:text="${trip.arrivalTime != null ? trip.arrivalTime : '07:55 AM'}">07:55 AM</div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="text-muted small">Driver Name</div>
+                            <div class="fw-bold text-dark" th:text="${trip.driverName}">R. Murugan</div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="text-muted small">Driver Contact</div>
+                            <div class="fw-bold text-dark" th:text="${trip.driverPhone}">+91 98401 12233</div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="text-muted small">Booking Cutoff</div>
+                            <div class="fw-bold text-danger" th:text="${trip.bookingCutoffTime}">06:30 AM</div>
+                        </div>
+                    </div>
+
+                    <!-- Stops Timeline -->
+                    <h5 class="fw-bold text-primary mb-3"><i class="fas fa-map-marked-alt me-2"></i> Route Stops in Sequence</h5>
+                    <div class="stop-timeline">
+                        <div th:each="rs, stat : ${routeStops}" class="stop-timeline-item"
+                             th:classappend="${stat.first ? 'start' : (stat.last ? 'end' : '')}">
+                            <div class="stop-timeline-point"></div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong class="text-dark" th:text="${rs.stop.stopName}">Stop Name</strong>
+                                    <span class="badge bg-secondary-subtle text-secondary ms-2" th:text="${rs.stop.area}">Area</span>
+                                    <div class="small text-muted" th:text="${rs.stop.locationDescription}">Location Landmark</div>
+                                </div>
+                                <div class="text-end small">
+                                    <span class="badge bg-light text-dark border">
+                                        Stop #<span th:text="${rs.stopSequence}">1</span>
+                                    </span>
+                                    <div class="text-muted" th:if="${rs.estimatedTravelMinutes > 0}" th:text="'+ ' + ${rs.estimatedTravelMinutes} + ' mins'">+ 15 mins</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alternative Trips Section if current trip is full or user wants options -->
+                <div class="custom-card p-4" th:if="${alternatives != null && !alternatives.isEmpty()}">
+                    <h5 class="fw-bold text-secondary mb-3"><i class="fas fa-exchange-alt me-2"></i> Other Trips on this Route</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6" th:each="alt : ${alternatives}">
+                            <div class="p-3 border rounded-3 bg-light d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="badge bg-primary me-1" th:text="${alt.busNumber}">BUS-102</span>
+                                    <strong th:text="${alt.departureTime}">08:00 AM</strong>
+                                    <div class="small text-muted">Seats: <span th:text="${alt.availableSeats}">40</span> left</div>
+                                </div>
+                                <a th:href="@{/bus-details/{id}(id=${alt.tripId})}" class="btn btn-sm btn-outline-primary rounded-pill">View</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Booking Selection Card -->
+            <div class="col-lg-4">
+                <div class="custom-card p-4 sticky-top" style="top: 90px;">
+                    <h5 class="fw-bold text-primary mb-3"><i class="fas fa-ticket-alt me-2"></i> Reserve Your Seat</h5>
+
+                    <!-- If Available -> Form to Confirm -->
+                    <div th:if="${trip.availableSeats > 0}">
+                        <form th:action="@{/booking/confirm}" method="get">
+                            <input type="hidden" name="tripId" th:value="${trip.tripId}"/>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Select Your Pickup Stop</label>
+                                <select name="pickupStopId" class="form-select form-select-sm" required>
+                                    <option th:each="rs : ${routeStops}" th:value="${rs.stop.stopId}"
+                                            th:text="${rs.stopSequence} + '. ' + ${rs.stop.stopName} + ' (' + ${rs.stop.area} + ')'"
+                                            th:selected="${trip.pickupStopId != null && trip.pickupStopId == rs.stop.stopId}"></option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Select Dropoff Stop</label>
+                                <select name="dropoffStopId" class="form-select form-select-sm" required>
+                                    <option th:each="rs : ${routeStops}" th:value="${rs.stop.stopId}"
+                                            th:text="${rs.stopSequence} + '. ' + ${rs.stop.stopName} + ' (' + ${rs.stop.area} + ')'"
+                                            th:selected="${trip.dropoffStopId != null ? trip.dropoffStopId == rs.stop.stopId : stat != null && stat.last}"></option>
+                                </select>
+                            </div>
+
+                            <div class="p-3 bg-light rounded-3 small mb-3 border">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-muted">Total Bus Capacity:</span>
+                                    <strong th:text="${trip.totalSeats}">50</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-muted">Currently Confirmed:</span>
+                                    <strong class="text-danger" th:text="${trip.bookedSeats}">5</strong>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">Seats Available:</span>
+                                    <strong class="text-success" th:text="${trip.availableSeats}">45</strong>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary-custom w-100 py-2">
+                                Review & Confirm Booking <i class="fas fa-arrow-right ms-1"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- If Full -> Seat Request Option -->
+                    <div th:if="${trip.availableSeats <= 0}">
+                        <div class="alert alert-danger p-3 rounded-3 small mb-3">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            <strong>This bus has reached full capacity.</strong>
+                            You cannot book directly, but you can submit an administrative Seat Request.
+                        </div>
+
+                        <form th:action="@{/seat-request/new}" method="post">
+                            <input type="hidden" name="tripId" th:value="${trip.tripId}"/>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Pickup Stop</label>
+                                <select name="pickupStopId" class="form-select form-select-sm" required>
+                                    <option th:each="rs : ${routeStops}" th:value="${rs.stop.stopId}" th:text="${rs.stop.stopName}"></option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Dropoff Stop</label>
+                                <select name="dropoffStopId" class="form-select form-select-sm" required>
+                                    <option th:each="rs : ${routeStops}" th:value="${rs.stop.stopId}" th:text="${rs.stop.stopName}"></option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-warning w-100 py-2 fw-bold rounded-pill">
+                                <i class="fas fa-hand-paper me-1"></i> Submit Seat Request
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/aadhi-widget :: aadhiWidget}"></div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>
