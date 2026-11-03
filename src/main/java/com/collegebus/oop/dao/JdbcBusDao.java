@@ -30,8 +30,8 @@ public class JdbcBusDao implements DatabaseOperations<CollegeBus, Long> {
     // ==========================================
     @Override
     public CollegeBus create(CollegeBus bus) throws DatabaseOperationException {
-        String sql = "INSERT INTO buses (bus_number, registration_number, total_seats, bus_type, bus_status) " +
-                     "VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO buses (bus_number, registration_number, total_seats, bus_type, bus_status, created_at) " +
+                     "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = CollegeBusDBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -41,6 +41,7 @@ public class JdbcBusDao implements DatabaseOperations<CollegeBus, Long> {
             pstmt.setInt(3, bus.getCapacity());
             pstmt.setString(4, bus instanceof AirConditionedBus ? "AC" : "NON_AC");
             pstmt.setString(5, bus.getStatus());
+            pstmt.setTimestamp(6, new java.sql.Timestamp(System.currentTimeMillis()));
 
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows == 0) {

@@ -52,7 +52,7 @@ public class SecurityConfig {
                 // Static resources
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico").permitAll()
                 // Public landing, search, chatbot REST API, and OOP Architecture Demo
-                .requestMatchers("/", "/login", "/register", "/calendar", "/select-slot", "/find-bus", "/bus-details/**", "/api/chatbot/**", "/talk-to-aadhi", "/oop-demo", "/api/oop/**").permitAll()
+                .requestMatchers("/", "/login", "/register", "/calendar", "/select-slot", "/find-bus", "/bus-details/**", "/api/chatbot/**", "/talk-to-aadhi", "/oop-demo", "/api/oop/**", "/h2-console/**").permitAll()
                 // Role-based restrictions
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/student/**").hasAnyRole("STUDENT", "ADMIN")
@@ -81,8 +81,9 @@ public class SecurityConfig {
                 .accessDeniedPage("/access-denied")
             )
             .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/api/chatbot/**", "/api/oop/**")
+                .ignoringRequestMatchers("/api/chatbot/**", "/api/oop/**", "/h2-console/**")
             )
+            .headers(headers -> headers.frameOptions(frame -> frame.disable()))
             .sessionManagement(session -> session
                 .maximumSessions(2)
                 .maxSessionsPreventsLogin(false)

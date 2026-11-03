@@ -113,12 +113,13 @@ public class CollegeBusDBConnection {
             // Table: bookings
             stmt.execute("CREATE TABLE IF NOT EXISTS bookings (" +
                     "booking_id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
-                    "booking_reference VARCHAR(50) NOT NULL UNIQUE, " +
                     "trip_id BIGINT, " +
                     "user_id BIGINT, " +
                     "pickup_stop_id BIGINT, " +
-                    "drop_stop_id BIGINT, " +
+                    "dropoff_stop_id BIGINT, " +
                     "booking_status VARCHAR(30) NOT NULL DEFAULT 'CONFIRMED', " +
+                    "booking_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                    "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
                     "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);");
 
             // Seed initial sample buses if empty

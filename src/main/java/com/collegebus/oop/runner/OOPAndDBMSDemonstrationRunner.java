@@ -38,6 +38,11 @@ public class OOPAndDBMSDemonstrationRunner {
 
         printBanner("ALL 6 OOP CONCEPTS & DBMS OPERATIONS VERIFIED SUCCESSFULLY");
         System.out.println("System is 100% compliant with university examination requirements!\n");
+
+        try {
+            com.mysql.cj.jdbc.AbandonedConnectionCleanupThread.checkedShutdown();
+        } catch (Throwable ignored) {
+        }
     }
 
     // ==========================================

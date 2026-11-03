@@ -28,8 +28,8 @@ public class JdbcBookingDao {
                                              Long pickupStopId, Long dropStopId)
             throws DatabaseOperationException {
 
-        String sqlInsert = "INSERT INTO bookings (booking_reference, trip_id, user_id, pickup_stop_id, drop_stop_id, booking_status) " +
-                           "VALUES (?, ?, ?, ?, ?, 'CONFIRMED')";
+        String sqlInsert = "INSERT INTO bookings (trip_id, user_id, pickup_stop_id, dropoff_stop_id, booking_status, booking_date, updated_at) " +
+                           "VALUES (?, ?, ?, ?, 'CONFIRMED', ?, ?)";
 
         Connection conn = null;
         try {
@@ -39,11 +39,12 @@ public class JdbcBookingDao {
 
             Long generatedId = null;
             try (PreparedStatement pstmt = conn.prepareStatement(sqlInsert, Statement.RETURN_GENERATED_KEYS)) {
-                pstmt.setString(1, bookingRef);
-                pstmt.setObject(2, tripId);
-                pstmt.setObject(3, userId);
-                pstmt.setObject(4, pickupStopId);
-                pstmt.setObject(5, dropStopId);
+                pstmt.setObject(1, tripId);
+                pstmt.setObject(2, userId);
+                pstmt.setObject(3, pickupStopId);
+                pstmt.setObject(4, dropStopId);
+                pstmt.setTimestamp(5, new java.sql.Timestamp(System.currentTimeMillis()));
+                pstmt.setTimestamp(6, new java.sql.Timestamp(System.currentTimeMillis()));
 
                 int rows = pstmt.executeUpdate();
                 if (rows == 0) {

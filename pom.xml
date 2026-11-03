@@ -66,11 +66,10 @@
             <artifactId>mysql-connector-j</artifactId>
         </dependency>
 
-        <!-- H2 Database for In-Memory Unit and Integration Testing -->
+        <!-- H2 Database for In-Memory Execution, Testing and Offline Presentation -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <scope>test</scope>
         </dependency>
 
         <!-- Spring Boot Test Starter (JUnit 5, Mockito, AssertJ) -->
