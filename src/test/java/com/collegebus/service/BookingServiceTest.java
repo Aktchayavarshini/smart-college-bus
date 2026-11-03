@@ -143,3 +143,4 @@ class BookingServiceTest {
         verify(bookingRepository, times(1)).save(booking);
     }
 }
+

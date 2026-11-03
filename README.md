@@ -11,6 +11,18 @@ An integrated full-stack campus transit management web application developed usi
 
 ---
 
+### 🎓 Academic Review & Prescribed Requirements Compliance
+> **Mandatory Review Criteria Satisfied:** Equal importance is given to both **Core Object-Oriented Programming (OOP)** and **Relational Database Management Systems (DBMS)**.
+> - **Language & Runtime:** Implemented using **Java 17 / 21** and Spring Boot 3.2.5.
+> - **All 6 Core OOP Concepts:** Encapsulation, Multi-level Inheritance, Polymorphism (Overloading & Overriding), Abstraction (Abstract Classes & Interfaces), Packages, and Custom Exception Handling with Try-Catch-Finally.
+> - **Proper DBMS Architecture:** 13 normalized tables (`CollegeBusDB`) with primary keys, foreign keys, constraints, and indexes.
+> - **Direct JDBC CRUD & ACID:** Pure `java.sql` JDBC DAOs executing **CREATE, READ, UPDATE, and DELETE** operations with transaction rollback.
+> - **Interactive Viva Demonstrations:**
+>   - **Terminal / Eclipse Runner:** `com.collegebus.oop.runner.OOPAndDBMSDemonstrationRunner`
+>   - **Web Architecture Portal:** Live interactive portal at `http://localhost:8080/oop-demo`
+
+---
+
 ## Table of Contents
 
 1. [Project Overview](#project-overview)
@@ -224,20 +236,24 @@ The SQL setup script (`database/CollegeBusDB.sql`) seeds default accounts with p
 
 ---
 
-## CLI & Maven Execution
+## CLI, Maven & Standalone OOP Demonstration
 
-You can also run the application directly from the command line:
+You can run both the full web application and the standalone OOP & DBMS terminal test:
 
 ```bash
 # 1. Clone repository
 git clone https://github.com/Aktchayavarshini/smart-college-bus.git
 cd smart-college-bus
 
-# 2. Build and verify test suite
-mvn clean test
+# 2. Run the all unit tests (19 test cases covering OOP & DBMS CRUD)
+./mvnw clean test
 
-# 3. Run the Spring Boot application (passing MySQL password)
-mvn spring-boot:run -Dspring-boot.run.arguments="--spring.datasource.password=YOUR_DB_PASSWORD"
+# 3. Run Standalone OOP & DBMS Demonstration Runner (for Viva-Voce / Project Review)
+./mvnw test-compile
+java -cp "target/classes;target/dependency/*" com.collegebus.oop.runner.OOPAndDBMSDemonstrationRunner
+
+# 4. Run the full Spring Boot Web Application
+./mvnw spring-boot:run
 ```
 
 ---

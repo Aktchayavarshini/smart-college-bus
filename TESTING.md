@@ -25,6 +25,18 @@ The testing phase verifies functional correctness, data integrity, concurrency s
 | **TC-UNIT-06** | `ChatbotServiceTest` | `testProcessGreeting()` | Sends "Hello Aadhi" query | Returns greeting, suggestions, and DB assistant role | **PASSED** |
 | **TC-UNIT-07** | `ChatbotServiceTest` | `testProcessBookingHelp()` | Asks "How do I book a seat?" | Returns 3-step booking guidance and `/find-bus` action link | **PASSED** |
 | **TC-UNIT-08** | `ChatbotServiceTest` | `testProcessLocalitySearch_Pallavaram()` | Queries "Find bus to Pallavaram" | Analyzes stop sequence, routes, and departure times | **PASSED** |
+| **TC-OOP-01** | `OOPConceptsTest` | `testEncapsulation_CapacityBoundaryValidation()` | Tests capacity mutators with negative, zero, and excessive values | Throws `InvalidDataException`, protects state invariants | **PASSED** |
+| **TC-OOP-02** | `OOPConceptsTest` | `testEncapsulation_PersonDataIntegrity()` | Tests email regex and phone privacy masking | Formats masked phone `******3210`, blocks bad email | **PASSED** |
+| **TC-OOP-03** | `OOPConceptsTest` | `testInheritance_VehicleAndPersonHierarchies()` | Instantiates `AirConditionedBus`, `StandardCollegeBus`, `StudentPassenger` | Subclasses inherit and specialize base properties | **PASSED** |
+| **TC-OOP-04** | `OOPConceptsTest` | `testPolymorphism_CompileTimeMethodOverloading()` | Evaluates 3 overloaded `calculateFare` methods (1, 2, 3 params) | Computes standard, peak, and concession fares | **PASSED** |
+| **TC-OOP-05** | `OOPConceptsTest` | `testPolymorphism_RuntimeDynamicMethodDispatch()` | Analyzes fleet cost iterating on `List<AbstractVehicle>` | Dispatches subclass cost calculations dynamically | **PASSED** |
+| **TC-OOP-06** | `OOPConceptsTest` | `testAbstraction_BookableContract()` | Tests `reserveSeat()` and `releaseSeat()` on `Bookable` interface | Correctly reserves, releases, and reports seat state | **PASSED** |
+| **TC-OOP-07** | `OOPConceptsTest` | `testExceptionHandling_CustomExceptions()` | Tests `SeatNotAvailableException` and `DuplicateBookingException` | Custom checked exceptions thrown and caught | **PASSED** |
+| **TC-DBMS-01** | `JdbcDatabaseCrudTest` | `testJdbcConnection_Metadata()` | Establishes raw JDBC connection and inspects DB metadata | Active `java.sql.Connection` verified | **PASSED** |
+| **TC-DBMS-02** | `JdbcDatabaseCrudTest` | `testBusCrudLifecycle()` | Executes full Create, Read, Update, Delete on `buses` table | All 4 CRUD operations execute successfully via JDBC | **PASSED** |
+| **TC-DBMS-03** | `JdbcDatabaseCrudTest` | `testTransactionalBooking()` | Executes ACID transactional seat reservation with commit/rollback | Transaction atomicity verified | **PASSED** |
+
+> **Total Automated Tests:** **19 Passed, 0 Failed, 0 Skipped (100% Pass Rate)**
 
 ---
 
@@ -68,3 +80,4 @@ mvn surefire-report:report
 # Package verified production artifact
 mvn clean package -DskipTests=false
 ```
+

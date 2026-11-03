@@ -59,7 +59,7 @@ public class ChatbotServiceImpl implements ChatbotService {
         }
 
         // 2. Booking questions / guidance
-        if (q.contains("how to book") || q.contains("book seat") || q.contains("steps to book")) {
+        if (q.contains("how to book") || q.contains("book a seat") || q.contains("book seat") || q.contains("steps to book") || (q.contains("book") && q.contains("seat"))) {
             return new ChatbotResponseDto(
                     "Booking a seat is simple in 3 steps:\n" +
                     "1. Visit 'Find Bus' and select your Travel Date and Preferred Time Slot.\n" +

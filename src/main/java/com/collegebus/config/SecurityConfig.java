@@ -51,8 +51,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Static resources
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico").permitAll()
-                // Public landing, search, and chatbot REST API
-                .requestMatchers("/", "/login", "/register", "/calendar", "/select-slot", "/find-bus", "/bus-details/**", "/api/chatbot/**", "/talk-to-aadhi").permitAll()
+                // Public landing, search, chatbot REST API, and OOP Architecture Demo
+                .requestMatchers("/", "/login", "/register", "/calendar", "/select-slot", "/find-bus", "/bus-details/**", "/api/chatbot/**", "/talk-to-aadhi", "/oop-demo", "/api/oop/**").permitAll()
                 // Role-based restrictions
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/student/**").hasAnyRole("STUDENT", "ADMIN")
@@ -79,6 +79,9 @@ public class SecurityConfig {
             )
             .exceptionHandling(ex -> ex
                 .accessDeniedPage("/access-denied")
+            )
+            .csrf(csrf -> csrf
+                .ignoringRequestMatchers("/api/chatbot/**", "/api/oop/**")
             )
             .sessionManagement(session -> session
                 .maximumSessions(2)

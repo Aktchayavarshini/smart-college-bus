@@ -13,3 +13,4 @@ class SmartCollegeBusApplicationTests {
         // Confirms that Spring Boot Application Context loads successfully
     }
 }
+
