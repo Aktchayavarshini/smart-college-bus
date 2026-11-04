@@ -3,6 +3,7 @@ package com.collegebus.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 
 public class UserRegistrationDto {
 
@@ -12,13 +13,15 @@ public class UserRegistrationDto {
 
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
+    @Size(max = 100, message = "Email must not exceed 100 characters")
     private String email;
 
     @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Password must be at least 6 characters")
+    @Size(min = 8, max = 72, message = "Password must be between 8 and 72 characters")
     private String password;
 
     @NotBlank(message = "Phone number is required")
+    @Pattern(regexp = "^[+0-9() .-]{7,20}$", message = "Enter a valid phone number")
     private String phoneNumber;
 
     @NotBlank(message = "Role is required")
