@@ -57,13 +57,17 @@
                             <div class="text-muted small">Expected Arrival</div>
                             <div class="fw-bold text-dark" th:text="${trip.arrivalTime != null ? trip.arrivalTime : '07:55 AM'}">07:55 AM</div>
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-4" th:if="${currentUser != null}">
                             <div class="text-muted small">Driver Name</div>
-                            <div class="fw-bold text-dark" th:text="${trip.driverName}">R. Murugan</div>
+                            <div class="fw-bold text-dark" th:text="${trip.driverName}">Driver name</div>
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-4" th:if="${currentUser != null}">
                             <div class="text-muted small">Driver Contact</div>
-                            <div class="fw-bold text-dark" th:text="${trip.driverPhone}">+91 98401 12233</div>
+                            <div class="fw-bold text-dark" th:text="${trip.driverPhone}">Driver contact</div>
+                        </div>
+                        <div class="col-sm-8" th:unless="${currentUser != null}">
+                            <div class="text-muted small">Driver details</div>
+                            <div class="fw-bold text-secondary">Visible to signed-in users</div>
                         </div>
                         <div class="col-sm-4">
                             <div class="text-muted small">Booking Cutoff</div>
