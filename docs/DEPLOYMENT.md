@@ -12,6 +12,23 @@ The existing app is a Spring Boot + Thymeleaf application. Vercel does not host 
 
 The application defaults to the `prod` profile when no profile is selected. Local development must explicitly set `SPRING_PROFILES_ACTIVE=dev`; automated tests use the isolated `test` profile. This fail-closed default prevents an accidentally misconfigured deployment from starting with the demo H2 database and sample accounts.
 
+## Container build
+
+A multi-stage Java 17 Docker image is provided. It runs as an unprivileged UID and packages the application after running the Maven verification suite.
+
+```bash
+docker build -t smart-college-bus:release .
+docker run --rm -p 8080:8080 \
+  -e SPRING_PROFILES_ACTIVE=prod \
+  -e DB_URL='jdbc:mysql://HOST:3306/CollegeBusDB?serverTimezone=UTC&sslMode=REQUIRED' \
+  -e DB_USERNAME='APP_USER' \
+  -e DB_PASSWORD='INJECT_FROM_SECRET_MANAGER' \
+  -e FRONTEND_ORIGIN='https://YOUR_FRONTEND_ORIGIN' \
+  smart-college-bus:release
+```
+
+Do not put real passwords in shell history or deployment manifests; configure them through the hosting provider's secret manager. The command above is a configuration example, not a deployed environment.
+
 ## Required production environment variables
 
 | Variable | Required value |
