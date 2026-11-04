@@ -56,7 +56,8 @@ public class TransitQueryApiController {
             @RequestParam(required = false) Long dropoffStopId) {
 
         if (travelDate.isBefore(LocalDate.now())
-                || (pickupStopId != null && pickupStopId.equals(dropoffStopId))) {
+                || (pickupStopId != null && pickupStopId.equals(dropoffStopId))
+                || !isActiveStop(pickupStopId) || !isActiveStop(dropoffStopId)) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -72,11 +73,20 @@ public class TransitQueryApiController {
             @PathVariable Long tripId,
             @RequestParam(required = false) Long pickupStopId,
             @RequestParam(required = false) Long dropoffStopId) {
-        if (pickupStopId != null && pickupStopId.equals(dropoffStopId)) {
+        if ((pickupStopId != null && pickupStopId.equals(dropoffStopId))
+                || !isActiveStop(pickupStopId) || !isActiveStop(dropoffStopId)) {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(TripResponse.from(
                 tripService.getTripCardById(tripId, pickupStopId, dropoffStopId)));
+    }
+
+    private boolean isActiveStop(Long stopId) {
+        if (stopId == null) {
+            return true;
+        }
+        return busStopService.getActiveStops().stream()
+                .anyMatch(stop -> stop.getStopId().equals(stopId));
     }
 
     public record StopResponse(Long id, String name, String area, String description) {}
