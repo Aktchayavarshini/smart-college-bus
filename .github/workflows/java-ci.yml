@@ -34,7 +34,7 @@ jobs:
           --health-timeout=5s
           --health-retries=10
     env:
-      DB_URL: jdbc:mysql://127.0.0.1:3306/CollegeBusDB?serverTimezone=UTC&sslMode=DISABLED
+      DB_URL: jdbc:mysql://127.0.0.1:3306/CollegeBusDB?serverTimezone=UTC&sslMode=DISABLED&allowPublicKeyRetrieval=true
       DB_USERNAME: collegebus_app
       DB_PASSWORD: ci-only-pass
       FRONTEND_ORIGIN: https://example.test
