@@ -13,7 +13,7 @@ The repository currently contains 25 JUnit 5 tests across the following suites:
 | `JdbcDatabaseCrudTest` | 3 | JDBC connection, CRUD lifecycle, and transaction behavior |
 | `UserServiceImplTest` | 2 | Rejects privileged and unknown self-registration roles before persistence |
 | `ProductionSecurityIntegrationTest` | 4 | Public read API, CSRF bootstrap, admin authentication boundary, and development-only JDBC demo boundary |
-| **Total** | **25** | **Unit and Spring integration coverage** |
+| **Total** | **26** | **Unit, Spring security integration, and MySQL production-schema startup coverage** |
 
 Run the same verification used by CI:
 
