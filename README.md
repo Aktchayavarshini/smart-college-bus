@@ -175,16 +175,11 @@ The database `CollegeBusDB` consists of **13 normalized relational tables** usin
 
 ---
 
-## Pre-Seeded Test Accounts
+## Development Demo Accounts (local only)
 
-The SQL setup script (`database/CollegeBusDB.sql`) seeds default accounts with pre-hashed BCrypt passwords for evaluation:
+When the application runs with the default `dev` profile, `DataInitializer` creates local demonstration accounts such as `admin@collegebus.edu` (`Admin@123`), `student@collegebus.edu` (`Student@123`), and `teacher@collegebus.edu` (`Teacher@123`). These are disposable development credentials only. The initializer is disabled outside the `dev` profile.
 
-| Role | Email Address | Default Password | Description |
-| :--- | :--- | :--- | :--- |
-| **ADMIN** | `admin@collegebus.edu` | `Admin@123` | Transport Controller / Full Operations Access |
-| **TEACHER** | `teacher@collegebus.edu` | `Teacher@123` | Dr. Arulmozhi Varman (Associate Professor, CSE) |
-| **STUDENT** | `student@collegebus.edu` | `Student@123` | Mukesh K (Day Scholar, 3rd Year CSE) |
-| **STUDENT (Hostel)** | `hostel@collegebus.edu` | `Student@123` | Deepika R (Hostel Resident, Kaveri Block B) |
+`database/CollegeBusDB.sql` is a destructive academic/demo script containing sample users and operational records. Never run it against production or any database containing real data. Production provisioning must use [`database/CollegeBusDB-production-schema.sql`](database/CollegeBusDB-production-schema.sql), which creates the schema without demo accounts or sample records. Follow [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for controlled administrator provisioning.
 
 ---
 
