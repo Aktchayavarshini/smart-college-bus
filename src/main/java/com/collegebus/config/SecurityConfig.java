@@ -90,7 +90,7 @@ public class SecurityConfig {
                 // Authenticated features
                 auth.requestMatchers("/booking/**", "/my-bookings", "/booking-history", "/seat-request/**", "/profile", "/academic-timetable", "/exam-timetable").authenticated();
                 if (environment.acceptsProfiles(Profiles.of("dev"))) {
-                    auth.requestMatchers("/h2-console/**").permitAll();
+                    auth.requestMatchers("/h2-console/**", "/oop-demo", "/api/oop/**").permitAll();
                 }
                 auth.anyRequest().authenticated();
             })
