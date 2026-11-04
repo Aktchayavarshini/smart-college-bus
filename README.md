@@ -175,16 +175,11 @@ The database `CollegeBusDB` consists of **13 normalized relational tables** usin
 
 ---
 
-## Pre-Seeded Test Accounts
+## Development Demo Accounts (local only)
 
-The SQL setup script (`database/CollegeBusDB.sql`) seeds default accounts with pre-hashed BCrypt passwords for evaluation:
+When the application runs with the default `dev` profile, `DataInitializer` creates local demonstration accounts such as `admin@collegebus.edu` (`Admin@123`), `student@collegebus.edu` (`Student@123`), and `teacher@collegebus.edu` (`Teacher@123`). These are disposable development credentials only. The initializer is disabled outside the `dev` profile.
 
-| Role | Email Address | Default Password | Description |
-| :--- | :--- | :--- | :--- |
-| **ADMIN** | `admin@collegebus.edu` | `Admin@123` | Transport Controller / Full Operations Access |
-| **TEACHER** | `teacher@collegebus.edu` | `Teacher@123` | Dr. Arulmozhi Varman (Associate Professor, CSE) |
-| **STUDENT** | `student@collegebus.edu` | `Student@123` | Mukesh K (Day Scholar, 3rd Year CSE) |
-| **STUDENT (Hostel)** | `hostel@collegebus.edu` | `Student@123` | Deepika R (Hostel Resident, Kaveri Block B) |
+`database/CollegeBusDB.sql` is a destructive academic/demo script containing sample users and operational records. Never run it against production or any database containing real data. Production provisioning must use [`database/CollegeBusDB-production-schema.sql`](database/CollegeBusDB-production-schema.sql), which creates the schema without demo accounts or sample records. Follow [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for controlled administrator provisioning.
 
 ---
 
@@ -202,17 +197,14 @@ The SQL setup script (`database/CollegeBusDB.sql`) seeds default accounts with p
 ## MySQL Workbench Setup
 
 1. Open **MySQL Workbench** and connect to your local MySQL instance (`localhost:3306`).
-2. Open the SQL file located in the project repository:
-   ```
-   database/CollegeBusDB.sql
-   ```
+2. Open `database/CollegeBusDB.sql`. This is a destructive academic/demo dataset script; use it only with a disposable local database that contains no real data.
 3. Execute the script (`Execute SQL Script` or press `Ctrl + Shift + Enter`).
 4. The script will automatically:
    - Create database `CollegeBusDB`.
    - Create all 13 InnoDB tables with primary keys, foreign keys, and indexes.
    - Insert realistic sample records for Chennai routes (Pallavaram, Tambaram, Guindy, Velachery, Central).
    - Seed sample buses, drivers, timetable entries, and users.
-5. In MySQL Workbench Navigator, refresh the schema list and verify `CollegeBusDB` with all 13 tables.
+5. In MySQL Workbench Navigator, refresh the schema list and verify `CollegeBusDB` with all 13 tables. The SQL sample accounts are for schema demonstration; the default local app uses H2 and creates its own development accounts. For production, use the non-destructive `database/CollegeBusDB-production-schema.sql` and the provisioning steps in `docs/DEPLOYMENT.md`.
 
 ---
 
@@ -252,8 +244,11 @@ cd smart-college-bus
 ./mvnw test-compile
 java -cp "target/classes;target/dependency/*" com.collegebus.oop.runner.OOPAndDBMSDemonstrationRunner
 
-# 4. Run the full Spring Boot Web Application
-./mvnw spring-boot:run
+# 4. Run the full Spring Boot Web Application in local development mode
+SPRING_PROFILES_ACTIVE=dev ./mvnw spring-boot:run
+
+# PowerShell alternative:
+# $env:SPRING_PROFILES_ACTIVE='dev'; .\\mvnw.cmd spring-boot:run
 ```
 
 ---
@@ -295,3 +290,17 @@ mvn test
 This project is developed for college academic submission and is open-sourced under the [MIT License](LICENSE).
 
 Developed with pride using modern Java and Spring Boot technologies.
+
+
+---
+
+## Modern frontend integration (incremental)
+
+A Next.js + TypeScript frontend is being introduced under `frontend/`. The existing Spring Boot + Thymeleaf application remains available and retains the academic OOP/JDBC demonstrations.
+
+- Frontend setup: `cd frontend && npm install && npm run dev`
+- Frontend environment: copy `frontend/.env.example` to `frontend/.env.local` and set `NEXT_PUBLIC_API_BASE_URL`.
+- Backend API contract: [docs/API_CONTRACT.md](docs/API_CONTRACT.md)
+- Production deployment: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
+
+The initial frontend supports public stop discovery and scheduled-trip search. Booking mutations, account management, and administration remain on the existing authenticated application until their API/session contracts are implemented and tested. Do not treat the Next.js UI as a replacement for those flows yet.

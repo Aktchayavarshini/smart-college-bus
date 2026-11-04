@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.time.ZoneId;
 
 @Service
 @Transactional
@@ -133,8 +134,13 @@ public class TripServiceImpl implements TripService {
     @Override
     @Transactional(readOnly = true)
     public List<TripCardDto> searchTrips(BusSearchDto searchDto) {
-        LocalDate date = searchDto.getTravelDate() != null ? searchDto.getTravelDate() : LocalDate.now();
-        List<Trip> scheduledTrips = tripRepository.findByTravelDateAndTripStatus(date, "SCHEDULED");
+        LocalDate date = searchDto.getTravelDate() != null ? searchDto.getTravelDate() : LocalDate.now(ZoneId.of("Asia/Kolkata"));
+        List<Trip> scheduledTrips = tripRepository.findByTravelDateAndTripStatus(date, "SCHEDULED")
+                .stream()
+                .filter(t -> "ACTIVE".equalsIgnoreCase(t.getBus().getBusStatus()))
+                .filter(t -> "ACTIVE".equalsIgnoreCase(t.getRoute().getRouteStatus()))
+                .filter(t -> "ACTIVE".equalsIgnoreCase(t.getDriver().getDriverStatus()))
+                .toList();
 
         // Filter by preferred time slot if provided
         String slot = searchDto.getPreferredTimeSlot();
@@ -160,32 +166,29 @@ public class TripServiceImpl implements TripService {
                 Optional<BusStop> pickupStop = busStopRepository.findById(searchDto.getPickupStopId());
                 Optional<BusStop> dropoffStop = busStopRepository.findById(searchDto.getDropoffStopId());
 
-                if (pickupStop.isPresent() && dropoffStop.isPresent()) {
+                if (pickupStop.isPresent() && dropoffStop.isPresent()
+                        && "ACTIVE".equalsIgnoreCase(pickupStop.get().getStopStatus())
+                        && "ACTIVE".equalsIgnoreCase(dropoffStop.get().getStopStatus())) {
                     Optional<RouteStop> pRouteStop = routeStopRepository.findByRouteAndStop(trip.getRoute(), pickupStop.get());
                     Optional<RouteStop> dRouteStop = routeStopRepository.findByRouteAndStop(trip.getRoute(), dropoffStop.get());
 
-                    if (pRouteStop.isPresent() && dRouteStop.isPresent()) {
-                        // Ensure pickup stop comes strictly before dropoff stop
-                        if (pRouteStop.get().getStopSequence() < dRouteStop.get().getStopSequence()) {
-                            travelMinutes = Math.abs(dRouteStop.get().getEstimatedTravelMinutes() - pRouteStop.get().getEstimatedTravelMinutes());
-                            stopsMatch = true;
-                        } else {
-                            stopsMatch = false;
-                        }
+                    if (pRouteStop.isPresent() && dRouteStop.isPresent()
+                            && pRouteStop.get().getStopSequence() < dRouteStop.get().getStopSequence()) {
+                        travelMinutes = Math.abs(dRouteStop.get().getEstimatedTravelMinutes() - pRouteStop.get().getEstimatedTravelMinutes());
                     } else {
                         stopsMatch = false;
                     }
+                } else {
+                    stopsMatch = false;
                 }
             } else if (searchDto.getPickupStopId() != null) {
                 Optional<BusStop> pickupStop = busStopRepository.findById(searchDto.getPickupStopId());
-                if (pickupStop.isPresent()) {
-                    stopsMatch = routeStopRepository.findByRouteAndStop(trip.getRoute(), pickupStop.get()).isPresent();
-                }
+                stopsMatch = pickupStop.isPresent() && "ACTIVE".equalsIgnoreCase(pickupStop.get().getStopStatus())
+                        && routeStopRepository.findByRouteAndStop(trip.getRoute(), pickupStop.get()).isPresent();
             } else if (searchDto.getDropoffStopId() != null) {
                 Optional<BusStop> dropoffStop = busStopRepository.findById(searchDto.getDropoffStopId());
-                if (dropoffStop.isPresent()) {
-                    stopsMatch = routeStopRepository.findByRouteAndStop(trip.getRoute(), dropoffStop.get()).isPresent();
-                }
+                stopsMatch = dropoffStop.isPresent() && "ACTIVE".equalsIgnoreCase(dropoffStop.get().getStopStatus())
+                        && routeStopRepository.findByRouteAndStop(trip.getRoute(), dropoffStop.get()).isPresent();
             }
 
             if (stopsMatch) {

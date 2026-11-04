@@ -363,7 +363,7 @@ An interactive visual diagram is available at [`database/ER_Diagram.html`](datab
 The project provides pure JDBC database management in [`CollegeBusDBConnection.java`](file:///c:/Users/SUBITSHA/OneDrive/Desktop/smtclgbus/src/main/java/com/collegebus/oop/dao/CollegeBusDBConnection.java).
 - Loads official MySQL Driver: `com.mysql.cj.jdbc.Driver`.
 - Establishes connection via `DriverManager.getConnection(url, user, pass)`.
-- **Fail-Safe Mechanism:** If local MySQL on port 3306 is not active during an examiner's evaluation, it seamlessly provides an in-memory SQL connection with equivalent schemas, guaranteeing zero-crash presentations.
+- **Development fallback:** In the `dev` profile only, an in-memory H2 fallback supports offline academic demonstrations. Production requires explicit MySQL credentials and fails closed rather than switching to ephemeral storage.
 
 #### 6.5 CRUD Operations (Create, Read, Update, Delete)
 The class [`JdbcBusDao.java`](file:///c:/Users/SUBITSHA/OneDrive/Desktop/smtclgbus/src/main/java/com/collegebus/oop/dao/JdbcBusDao.java) implements all four CRUD operations using SQL `PreparedStatement`:
@@ -476,7 +476,7 @@ In `JdbcBusDao.mapResultSetToBus(ResultSet rs)`:
 
 The application contains comprehensive unit and integration test suites executed with JUnit 5 and Mockito:
 
-1. **`OOPConceptsTest.java` (7 Test Cases):**
+1. **`OOPConceptsTest.java` (8 Test Cases):**
    - Validates Encapsulation boundary checks and email regex validation.
    - Validates multi-level Inheritance on Vehicles and Persons.
    - Validates compile-time Method Overloading on `calculateFare`.
@@ -487,23 +487,19 @@ The application contains comprehensive unit and integration test suites executed
    - Validates raw JDBC Connection metadata.
    - Validates Create, Read, Update, and Delete operations on the `buses` table.
    - Validates ACID Transactional booking creation and rollback.
-3. **`BookingServiceTest.java` (5 Test Cases):**
+3. **`BookingServiceTest.java` (4 Test Cases):**
    - Tests capacity constraints, duplicate booking prevention, and transactional cancellation.
 4. **`ChatbotServiceTest.java` (3 Test Cases):**
    - Validates locality queries, booking guidance, and alternative route suggestions.
-5. **`SmartCollegeBusApplicationTests.java` (1 Test Case):**
+5. **`UserServiceImplTest.java` (2 Test Cases):** Rejects privileged and unknown self-registration roles before persistence.
+6. **`ProductionSecurityIntegrationTest.java` (5 Test Cases):** Checks public transit API access, CSRF bootstrap, configured CORS headers, admin authentication, and development-only JDBC demo access.
+7. **`ProductionProfileSchemaValidationTest.java` (1 Test Case):** Boots the production profile against the MySQL 8 schema-only database provisioned by CI.
+8. **`AdminBootstrapRunnerTest.java` (3 Test Cases):** Verifies opt-in administrator bootstrap, duplicate-admin avoidance, and fail-closed validation.
+7. **`SmartCollegeBusApplicationTests.java` (1 Test Case):**
    - Verifies Spring Boot ApplicationContext initialization and entity mapping.
 
 #### Test Execution Result:
-```
-[INFO] Results:
-[INFO] 
-[INFO] Tests run: 19, Failures: 0, Errors: 0, Skipped: 0
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-```
-**19 out of 19 test cases pass with 0 failures and 0 errors.**
+The repository now contains 30 automated tests, including registration-role checks, Spring Security integration tests, and a production-profile startup test against MySQL 8. The current CI result must be checked on the exact release commit; this report does not claim that manual browser tests or production MySQL concurrency tests have been completed.
 
 ---
 
@@ -528,9 +524,9 @@ java -cp "target/classes;target/dependency/*" com.collegebus.oop.runner.OOPAndDB
 6. **DBMS Direct JDBC:** Show the live JDBC `INSERT`, `SELECT`, `UPDATE`, `DELETE`, and row count queries on `CollegeBusDB`.
 
 #### Demonstration Step 2: Interactive Web Architecture Portal
-1. Start the application:
+1. Start the application in local development mode:
    ```bash
-   ./mvnw spring-boot:run
+   SPRING_PROFILES_ACTIVE=dev ./mvnw spring-boot:run
    ```
 2. Open browser at `http://localhost:8080/oop-demo`.
 3. Click the yellow **"Run Live OOP & JDBC CRUD Test"** button.

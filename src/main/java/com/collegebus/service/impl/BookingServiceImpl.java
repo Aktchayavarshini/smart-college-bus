@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.time.ZoneId;
 
 @Service
 @Transactional
@@ -36,17 +37,23 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public synchronized Booking bookSeat(User user, BookingRequestDto dto) {
-        Trip trip = tripRepository.findById(dto.getTripId())
+    public Booking bookSeat(User user, BookingRequestDto dto) {
+        Trip trip = tripRepository.findByIdForUpdate(dto.getTripId())
                 .orElseThrow(() -> new ResourceNotFoundException("Trip not found with ID: " + dto.getTripId()));
 
         if (!"SCHEDULED".equalsIgnoreCase(trip.getTripStatus())) {
             throw new BookingException("This trip is not available for booking (Status: " + trip.getTripStatus() + ")");
         }
+        if (!"ACTIVE".equalsIgnoreCase(trip.getBus().getBusStatus())
+                || !"ACTIVE".equalsIgnoreCase(trip.getRoute().getRouteStatus())
+                || !"ACTIVE".equalsIgnoreCase(trip.getDriver().getDriverStatus())) {
+            throw new BookingException("This trip is unavailable because its bus, route, or driver is not active.");
+        }
 
-        // Validate booking cutoff time
-        LocalDate today = LocalDate.now();
-        LocalTime nowTime = LocalTime.now();
+        // Campus operations use India Standard Time regardless of the hosting server's timezone.
+        ZoneId campusZone = ZoneId.of("Asia/Kolkata");
+        LocalDate today = LocalDate.now(campusZone);
+        LocalTime nowTime = LocalTime.now(campusZone);
         if (trip.getTravelDate().isBefore(today)) {
             throw new BookingException("Cannot book seats for past dates (" + trip.getTravelDate() + ").");
         }
@@ -73,6 +80,10 @@ public class BookingServiceImpl implements BookingService {
         if (pStop.getStopSequence() >= dStop.getStopSequence()) {
             throw new BookingException("Invalid stop selection: Pickup stop must precede Dropoff stop in the route direction.");
         }
+        if (!"ACTIVE".equalsIgnoreCase(pickup.getStopStatus())
+                || !"ACTIVE".equalsIgnoreCase(dropoff.getStopStatus())) {
+            throw new BookingException("Selected pickup and drop-off stops must both be active.");
+        }
 
         // Safe capacity check from confirmed bookings
         long confirmedCount = bookingRepository.countByTripAndBookingStatus(trip, "CONFIRMED");
@@ -98,6 +109,9 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Booking cancelBooking(Long bookingId, User currentUser) {
         Booking booking = getBookingById(bookingId);
+        // Serialize cancellation with new reservations for the same trip.
+        tripRepository.findByIdForUpdate(booking.getTrip().getTripId())
+                .orElseThrow(() -> new ResourceNotFoundException("Trip not found: " + booking.getTrip().getTripId()));
 
         // Security check: Only owner or admin can cancel
         if (!booking.getUser().getUserId().equals(currentUser.getUserId()) && !"ADMIN".equalsIgnoreCase(currentUser.getRole())) {
@@ -115,7 +129,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public synchronized Booking modifyBooking(Long currentBookingId, BookingRequestDto newBookingDto, User currentUser) {
+    public Booking modifyBooking(Long currentBookingId, BookingRequestDto newBookingDto, User currentUser) {
         Booking currentBooking = getBookingById(currentBookingId);
 
         if (!currentBooking.getUser().getUserId().equals(currentUser.getUserId()) && !"ADMIN".equalsIgnoreCase(currentUser.getRole())) {

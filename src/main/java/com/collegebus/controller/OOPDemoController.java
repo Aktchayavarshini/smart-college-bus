@@ -6,6 +6,7 @@ import com.collegebus.oop.model.*;
 import com.collegebus.oop.service.BusAllocationManager;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.context.annotation.Profile;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +20,7 @@ import java.util.*;
  * Designed specifically for Project Reviews, Evaluator Presentations, and Viva-Voce.
  */
 @Controller
+@Profile("dev")
 public class OOPDemoController {
 
     private final JdbcBusDao jdbcBusDao = new JdbcBusDao();

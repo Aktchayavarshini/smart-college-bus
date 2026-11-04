@@ -134,7 +134,7 @@
                             <div class="col-6">
                                 <span class="text-muted">Capacity:</span> <span th:text="${t.bookedSeats}">5</span> / <span th:text="${t.totalSeats}">50</span> Booked
                             </div>
-                            <div class="col-6" th:if="${t.driverName != null}">
+                            <div class="col-6" th:if="${t.driverName != null && currentUser != null}">
                                 <span class="text-muted">Driver:</span> <strong class="text-dark" th:text="${t.driverName}">R. Murugan</strong>
                             </div>
                             <div class="col-12" th:if="${t.estimatedTravelMinutes != null && t.estimatedTravelMinutes > 0}">

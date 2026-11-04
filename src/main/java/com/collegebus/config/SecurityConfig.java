@@ -2,7 +2,17 @@ package com.collegebus.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.beans.factory.annotation.Value;
+import java.util.List;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -19,11 +29,17 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
     private final CustomAuthenticationSuccessHandler successHandler;
+    private final Environment environment;
+
+    @Value("${app.frontend.origin:http://localhost:3000}")
+    private String frontendOrigin;
 
     public SecurityConfig(CustomUserDetailsService userDetailsService,
-                          CustomAuthenticationSuccessHandler successHandler) {
+                          CustomAuthenticationSuccessHandler successHandler,
+                          Environment environment) {
         this.userDetailsService = userDetailsService;
         this.successHandler = successHandler;
+        this.environment = environment;
     }
 
     @Bean
@@ -45,22 +61,42 @@ public class SecurityConfig {
     }
 
     @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of(frontendOrigin));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Content-Type", "X-CSRF-TOKEN", "X-Requested-With"));
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/api/**", configuration);
+        return source;
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        CookieCsrfTokenRepository csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        csrfTokenRepository.setHeaderName("X-CSRF-TOKEN");
+
         http
+            .cors(Customizer.withDefaults())
             .authenticationProvider(authenticationProvider())
-            .authorizeHttpRequests(auth -> auth
+            .authorizeHttpRequests(auth -> {
                 // Static resources
-                .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico").permitAll()
+                auth.requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico").permitAll();
+                auth.requestMatchers(HttpMethod.GET, "/api/v1/csrf", "/api/v1/stops", "/api/v1/trips", "/api/v1/trips/**").permitAll();
                 // Public landing, search, chatbot REST API, and OOP Architecture Demo
-                .requestMatchers("/", "/login", "/register", "/calendar", "/select-slot", "/find-bus", "/bus-details/**", "/api/chatbot/**", "/talk-to-aadhi", "/oop-demo", "/api/oop/**", "/h2-console/**").permitAll()
+                auth.requestMatchers("/", "/login", "/register", "/calendar", "/select-slot", "/find-bus", "/bus-details/**", "/api/chatbot/**", "/talk-to-aadhi").permitAll();
                 // Role-based restrictions
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/student/**").hasAnyRole("STUDENT", "ADMIN")
-                .requestMatchers("/teacher/**").hasAnyRole("TEACHER", "ADMIN")
+                auth.requestMatchers("/admin/**").hasRole("ADMIN");
+                auth.requestMatchers("/student/**").hasAnyRole("STUDENT", "ADMIN");
+                auth.requestMatchers("/teacher/**").hasAnyRole("TEACHER", "ADMIN");
                 // Authenticated features
-                .requestMatchers("/booking/**", "/my-bookings", "/booking-history", "/seat-request/**", "/profile", "/academic-timetable", "/exam-timetable").authenticated()
-                .anyRequest().authenticated()
-            )
+                auth.requestMatchers("/booking/**", "/my-bookings", "/booking-history", "/seat-request/**", "/profile", "/academic-timetable", "/exam-timetable").authenticated();
+                if (environment.acceptsProfiles(Profiles.of("dev"))) {
+                    auth.requestMatchers("/h2-console/**", "/oop-demo", "/api/oop/**").permitAll();
+                }
+                auth.anyRequest().authenticated();
+            })
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
@@ -80,14 +116,22 @@ public class SecurityConfig {
             .exceptionHandling(ex -> ex
                 .accessDeniedPage("/access-denied")
             )
-            .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/api/chatbot/**", "/api/oop/**", "/h2-console/**")
-            )
-            .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+            .csrf(csrf -> {
+                csrf.csrfTokenRepository(csrfTokenRepository);
+                csrf.ignoringRequestMatchers("/api/chatbot/**");
+                if (environment.acceptsProfiles(Profiles.of("dev"))) {
+                    csrf.ignoringRequestMatchers("/h2-console/**", "/api/oop/**");
+                }
+            })
+
             .sessionManagement(session -> session
                 .maximumSessions(2)
                 .maxSessionsPreventsLogin(false)
             );
+
+        if (environment.acceptsProfiles(Profiles.of("dev"))) {
+            http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+        }
 
         return http.build();
     }

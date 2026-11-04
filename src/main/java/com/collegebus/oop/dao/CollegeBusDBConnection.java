@@ -46,15 +46,13 @@ public class CollegeBusDBConnection {
         String user = System.getProperty("DB_USERNAME", System.getenv("DB_USERNAME"));
         String pass = System.getProperty("DB_PASSWORD", System.getenv("DB_PASSWORD"));
 
-        if (url == null || url.trim().isEmpty()) {
-            url = DEFAULT_MYSQL_URL;
+        boolean production = isProductionProfile();
+        if (production && (url == null || url.isBlank() || user == null || user.isBlank() || pass == null || pass.isBlank())) {
+            throw new DatabaseOperationException("Production JDBC access requires DB_URL, DB_USERNAME and DB_PASSWORD. Embedded fallback is disabled.", null);
         }
-        if (user == null) {
-            user = DEFAULT_MYSQL_USER;
-        }
-        if (pass == null) {
-            pass = DEFAULT_MYSQL_PASS;
-        }
+        if (url == null || url.trim().isEmpty()) url = DEFAULT_MYSQL_URL;
+        if (user == null) user = DEFAULT_MYSQL_USER;
+        if (pass == null) pass = DEFAULT_MYSQL_PASS;
 
         if (!fallbackMode) {
             try {
@@ -63,10 +61,11 @@ public class CollegeBusDBConnection {
                 Connection conn = DriverManager.getConnection(url, user, pass);
                 return conn;
             } catch (Exception ex) {
-                // Log and trigger fallback mode
+                if (production) {
+                    throw new DatabaseOperationException("Production MySQL connection failed; refusing ephemeral fallback.", ex);
+                }
                 fallbackMode = true;
-                System.out.println("[DBMS-WARN] MySQL server unavailable (" + ex.getMessage() + 
-                                   "). Activating in-memory fallback connection for demonstration.");
+                System.out.println("[DBMS-WARN] MySQL unavailable. Activating development-only H2 fallback.");
             }
         }
 
@@ -81,6 +80,11 @@ public class CollegeBusDBConnection {
         }
     }
 
+    private static boolean isProductionProfile() {
+        String activeProfiles = System.getProperty("spring.profiles.active", System.getenv("SPRING_PROFILES_ACTIVE"));
+        if (activeProfiles == null) return false;
+        return java.util.Arrays.stream(activeProfiles.split(",")).map(String::trim).anyMatch("prod"::equalsIgnoreCase);
+    }
     /**
      * Initializes relational schema for demonstration if running in embedded mode.
      */
