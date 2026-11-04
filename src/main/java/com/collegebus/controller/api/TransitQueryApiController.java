@@ -3,6 +3,7 @@ package com.collegebus.controller.api;
 import com.collegebus.dto.BusSearchDto;
 import com.collegebus.dto.TripCardDto;
 import com.collegebus.entity.Trip;
+import com.collegebus.exception.ResourceNotFoundException;
 import com.collegebus.service.BusStopService;
 import com.collegebus.service.TripService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 
@@ -56,7 +58,7 @@ public class TransitQueryApiController {
             @RequestParam(required = false) Long pickupStopId,
             @RequestParam(required = false) Long dropoffStopId) {
 
-        if (travelDate.isBefore(LocalDate.now())
+        if (travelDate.isBefore(LocalDate.now(ZoneId.of("Asia/Kolkata")))
                 || (pickupStopId != null && pickupStopId.equals(dropoffStopId))
                 || !isActiveStop(pickupStopId) || !isActiveStop(dropoffStopId)) {
             return ResponseEntity.badRequest().build();
@@ -78,7 +80,12 @@ public class TransitQueryApiController {
                 || !isActiveStop(pickupStopId) || !isActiveStop(dropoffStopId)) {
             return ResponseEntity.badRequest().build();
         }
-        Trip trip = tripService.getTripById(tripId);
+        Trip trip;
+        try {
+            trip = tripService.getTripById(tripId);
+        } catch (ResourceNotFoundException ex) {
+            return ResponseEntity.notFound().build();
+        }
         if (!"SCHEDULED".equalsIgnoreCase(trip.getTripStatus())
                 || !"ACTIVE".equalsIgnoreCase(trip.getBus().getBusStatus())
                 || !"ACTIVE".equalsIgnoreCase(trip.getRoute().getRouteStatus())
