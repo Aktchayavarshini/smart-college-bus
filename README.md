@@ -247,8 +247,11 @@ cd smart-college-bus
 ./mvnw test-compile
 java -cp "target/classes;target/dependency/*" com.collegebus.oop.runner.OOPAndDBMSDemonstrationRunner
 
-# 4. Run the full Spring Boot Web Application
-./mvnw spring-boot:run
+# 4. Run the full Spring Boot Web Application in local development mode
+SPRING_PROFILES_ACTIVE=dev ./mvnw spring-boot:run
+
+# PowerShell alternative:
+# $env:SPRING_PROFILES_ACTIVE='dev'; .\\mvnw.cmd spring-boot:run
 ```
 
 ---
