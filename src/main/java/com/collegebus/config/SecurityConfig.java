@@ -31,7 +31,7 @@ public class SecurityConfig {
     private final CustomAuthenticationSuccessHandler successHandler;
     private final Environment environment;
 
-    @Value(\"${app.frontend.origin:http://localhost:3000}\")
+    @Value("${app.frontend.origin:http://localhost:3000}")
     private String frontendOrigin;
 
     public SecurityConfig(CustomUserDetailsService userDetailsService,
