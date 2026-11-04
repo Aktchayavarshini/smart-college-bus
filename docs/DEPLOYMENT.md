@@ -10,6 +10,8 @@
 
 The existing app is a Spring Boot + Thymeleaf application. Vercel does not host this conventional long-running Spring Boot server. Deploy the backend to a Java-capable host and point a future Next.js frontend at its HTTPS API origin.
 
+The application defaults to the `prod` profile when no profile is selected. Local development must explicitly set `SPRING_PROFILES_ACTIVE=dev`; automated tests use the isolated `test` profile. This fail-closed default prevents an accidentally misconfigured deployment from starting with the demo H2 database and sample accounts.
+
 ## Required production environment variables
 
 | Variable | Required value |
