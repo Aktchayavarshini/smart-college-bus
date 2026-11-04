@@ -25,8 +25,8 @@ Do not commit production credentials. Use a least-privilege database account and
 ## Database provisioning
 
 1. Provision a new MySQL 8 database.
-2. Review `database/CollegeBusDB.sql` before execution. It contains destructive `DROP TABLE` statements and must only be used against an empty, newly provisioned database.
-3. Apply the schema and seed data to that empty database using the documented setup process.
+2. Review `database/CollegeBusDB-production-schema.sql` before execution. It contains destructive `DROP TABLE` statements and must only be used against a newly provisioned empty database.
+3. Apply this production schema-only script. It creates the 13 tables without inserting demo users, passwords, bookings, drivers, or sample trips. Do not use `database/CollegeBusDB.sql` in production; that file is a destructive academic/demo dataset.
 4. Deploy with `SPRING_PROFILES_ACTIVE=prod`.
 5. Production Hibernate mode is `validate`; schema changes must be applied deliberately before deploying code that depends on them.
 
