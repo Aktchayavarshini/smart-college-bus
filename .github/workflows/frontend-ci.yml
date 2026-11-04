@@ -38,5 +38,8 @@ jobs:
           node-version: '20'
       - name: Install dependencies
         run: npm install
+      - name: Audit production dependency vulnerabilities
+        run: npm audit --audit-level=high
+
       - name: Build Next.js application
         run: npm run build
