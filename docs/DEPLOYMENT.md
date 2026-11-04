@@ -51,6 +51,17 @@ Do not commit production credentials. Use a least-privilege database account and
 
 Do not point the destructive SQL script at a database containing real user or booking data.
 
+## Database application account
+
+Use a dedicated MySQL application account rather than `root`. Provision the schema with a DBA/deployment account, then grant the runtime account only the data privileges required by the application:
+
+```sql
+CREATE USER 'collegebus_app'@'%' IDENTIFIED BY 'USE_A_SECRET_MANAGER_GENERATED_PASSWORD';
+GRANT SELECT, INSERT, UPDATE, DELETE ON CollegeBusDB.* TO 'collegebus_app'@'%';
+```
+
+Restrict the account's network access at the database/provider firewall to the backend service where supported. Do not grant the runtime account `DROP`, `CREATE`, or `ALTER` privileges; schema changes are a separate reviewed deployment operation.
+
 ## Production data and administrator provisioning
 
 The demo `DataInitializer` is restricted to the `dev` profile. Production startup never creates sample students, staff, buses, trips, or a default administrator. Provision real operational data through a reviewed, access-controlled database import or the authenticated admin workflows.
