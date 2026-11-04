@@ -363,7 +363,7 @@ An interactive visual diagram is available at [`database/ER_Diagram.html`](datab
 The project provides pure JDBC database management in [`CollegeBusDBConnection.java`](file:///c:/Users/SUBITSHA/OneDrive/Desktop/smtclgbus/src/main/java/com/collegebus/oop/dao/CollegeBusDBConnection.java).
 - Loads official MySQL Driver: `com.mysql.cj.jdbc.Driver`.
 - Establishes connection via `DriverManager.getConnection(url, user, pass)`.
-- **Fail-Safe Mechanism:** If local MySQL on port 3306 is not active during an examiner's evaluation, it seamlessly provides an in-memory SQL connection with equivalent schemas, guaranteeing zero-crash presentations.
+- **Development fallback:** In the `dev` profile only, an in-memory H2 fallback supports offline academic demonstrations. Production requires explicit MySQL credentials and fails closed rather than switching to ephemeral storage.
 
 #### 6.5 CRUD Operations (Create, Read, Update, Delete)
 The class [`JdbcBusDao.java`](file:///c:/Users/SUBITSHA/OneDrive/Desktop/smtclgbus/src/main/java/com/collegebus/oop/dao/JdbcBusDao.java) implements all four CRUD operations using SQL `PreparedStatement`:
@@ -497,14 +497,6 @@ The application contains comprehensive unit and integration test suites executed
    - Verifies Spring Boot ApplicationContext initialization and entity mapping.
 
 #### Test Execution Result:
-```
-[INFO] Results:
-[INFO] 
-[INFO] Tests run: 19, Failures: 0, Errors: 0, Skipped: 0
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-```
 The repository now contains 25 automated tests, including registration-role and Spring Security integration tests. The current CI result must be checked on the exact release commit; this report does not claim that manual browser tests or production MySQL concurrency tests have been completed.
 
 ---
