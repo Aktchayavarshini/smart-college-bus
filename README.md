@@ -197,17 +197,14 @@ When the application runs with the default `dev` profile, `DataInitializer` crea
 ## MySQL Workbench Setup
 
 1. Open **MySQL Workbench** and connect to your local MySQL instance (`localhost:3306`).
-2. Open the SQL file located in the project repository:
-   ```
-   database/CollegeBusDB.sql
-   ```
+2. Open `database/CollegeBusDB.sql`. This is a destructive academic/demo dataset script; use it only with a disposable local database that contains no real data.
 3. Execute the script (`Execute SQL Script` or press `Ctrl + Shift + Enter`).
 4. The script will automatically:
    - Create database `CollegeBusDB`.
    - Create all 13 InnoDB tables with primary keys, foreign keys, and indexes.
    - Insert realistic sample records for Chennai routes (Pallavaram, Tambaram, Guindy, Velachery, Central).
    - Seed sample buses, drivers, timetable entries, and users.
-5. In MySQL Workbench Navigator, refresh the schema list and verify `CollegeBusDB` with all 13 tables.
+5. In MySQL Workbench Navigator, refresh the schema list and verify `CollegeBusDB` with all 13 tables. The SQL sample accounts are for schema demonstration; the default local app uses H2 and creates its own development accounts. For production, use the non-destructive `database/CollegeBusDB-production-schema.sql` and the provisioning steps in `docs/DEPLOYMENT.md`.
 
 ---
 
