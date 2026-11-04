@@ -31,7 +31,7 @@ Query parameters:
 - `pickupStopId` (optional)
 - `dropoffStopId` (optional)
 
-Returns the existing `TripCardDto` fields: trip and bus identifiers, route, travel date, departure/arrival, driver display details, seat counts, pickup/drop-off names, and estimated travel duration.
+Returns a privacy-minimised `TripResponse`: trip and bus identifiers, route, travel date, departure/arrival, driver display name, seat counts, pickup/drop-off names, and estimated travel duration. Driver phone numbers and internal booking fields are not exposed.
 
 Past travel dates return HTTP 400.
 
@@ -57,7 +57,7 @@ The endpoint is intended as a bootstrap for a future same-session API. The front
 
 ## Authentication boundary
 
-The v1 query endpoints are public. Existing booking, cancellation, modification, registration, timetable and admin flows remain on the existing MVC routes and Spring Security form-login session. No public booking mutation endpoint has been added. Do not expose a booking API until the frontend login/session flow, CSRF handling, role checks, and response DTOs have been integration-tested.
+The v1 query endpoints are public. Unknown or inactive stop IDs are rejected, and inactive buses, routes, and drivers are excluded from search results. Existing booking, cancellation, modification, registration, timetable and admin flows remain on the existing MVC routes and Spring Security form-login session. The destructive JDBC/OOP demo controller is loaded only under the `dev` profile and is not part of the production application. No public booking mutation endpoint has been added. Do not expose a booking API until the frontend login/session flow, CSRF handling, role checks, and response DTOs have been integration-tested.
 
 ## Cross-origin browser requests
 
