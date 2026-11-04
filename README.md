@@ -295,3 +295,17 @@ mvn test
 This project is developed for college academic submission and is open-sourced under the [MIT License](LICENSE).
 
 Developed with pride using modern Java and Spring Boot technologies.
+
+
+---
+
+## Modern frontend integration (incremental)
+
+A Next.js + TypeScript frontend is being introduced under `frontend/`. The existing Spring Boot + Thymeleaf application remains available and retains the academic OOP/JDBC demonstrations.
+
+- Frontend setup: `cd frontend && npm install && npm run dev`
+- Frontend environment: copy `frontend/.env.example` to `frontend/.env.local` and set `NEXT_PUBLIC_API_BASE_URL`.
+- Backend API contract: [docs/API_CONTRACT.md](docs/API_CONTRACT.md)
+- Production deployment: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
+
+The initial frontend supports public stop discovery and scheduled-trip search. Booking mutations, account management, and administration remain on the existing authenticated application until their API/session contracts are implemented and tested. Do not treat the Next.js UI as a replacement for those flows yet.
