@@ -82,7 +82,7 @@ public class SecurityConfig {
                 auth.requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico").permitAll();
                 auth.requestMatchers(HttpMethod.GET, "/api/v1/csrf", "/api/v1/stops", "/api/v1/trips", "/api/v1/trips/**").permitAll();
                 // Public landing, search, chatbot REST API, and OOP Architecture Demo
-                auth.requestMatchers("/", "/login", "/register", "/calendar", "/select-slot", "/find-bus", "/bus-details/**", "/api/chatbot/**", "/talk-to-aadhi", "/oop-demo", "/api/oop/**").permitAll();
+                auth.requestMatchers("/", "/login", "/register", "/calendar", "/select-slot", "/find-bus", "/bus-details/**", "/api/chatbot/**", "/talk-to-aadhi").permitAll();
                 // Role-based restrictions
                 auth.requestMatchers("/admin/**").hasRole("ADMIN");
                 auth.requestMatchers("/student/**").hasAnyRole("STUDENT", "ADMIN");
@@ -115,9 +115,9 @@ public class SecurityConfig {
             )
             .csrf(csrf -> {
                 csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
-                csrf.ignoringRequestMatchers("/api/chatbot/**", "/api/oop/**");
+                csrf.ignoringRequestMatchers("/api/chatbot/**");
                 if (environment.acceptsProfiles(Profiles.of("dev"))) {
-                    csrf.ignoringRequestMatchers("/h2-console/**");
+                    csrf.ignoringRequestMatchers("/h2-console/**", "/api/oop/**");
                 }
             })
 
