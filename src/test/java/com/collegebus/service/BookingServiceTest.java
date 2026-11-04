@@ -79,7 +79,7 @@ class BookingServiceTest {
     void testBookSeat_Success() {
         BookingRequestDto dto = new BookingRequestDto(10L, 101L, 102L);
 
-        when(tripRepository.findById(10L)).thenReturn(Optional.of(trip));
+        when(tripRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(trip));
         when(bookingRepository.findActiveBookingForUserOnTrip(studentUser, trip)).thenReturn(Optional.empty());
         when(busStopRepository.findById(101L)).thenReturn(Optional.of(stop1));
         when(busStopRepository.findById(102L)).thenReturn(Optional.of(stop2));
@@ -103,7 +103,7 @@ class BookingServiceTest {
     void testBookSeat_FullBus_ThrowsException() {
         BookingRequestDto dto = new BookingRequestDto(10L, 101L, 102L);
 
-        when(tripRepository.findById(10L)).thenReturn(Optional.of(trip));
+        when(tripRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(trip));
         when(bookingRepository.findActiveBookingForUserOnTrip(studentUser, trip)).thenReturn(Optional.empty());
         when(busStopRepository.findById(101L)).thenReturn(Optional.of(stop1));
         when(busStopRepository.findById(102L)).thenReturn(Optional.of(stop2));
@@ -120,7 +120,7 @@ class BookingServiceTest {
     void testBookSeat_DuplicateBooking_ThrowsException() {
         BookingRequestDto dto = new BookingRequestDto(10L, 101L, 102L);
 
-        when(tripRepository.findById(10L)).thenReturn(Optional.of(trip));
+        when(tripRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(trip));
         Booking existingBooking = new Booking(studentUser, trip, stop1, stop2, "Pallavaram", "Campus", "CONFIRMED");
         existingBooking.setBookingId(200L);
         when(bookingRepository.findActiveBookingForUserOnTrip(studentUser, trip)).thenReturn(Optional.of(existingBooking));
