@@ -3,6 +3,9 @@ package com.collegebus.repository;
 import com.collegebus.entity.Route;
 import com.collegebus.entity.Trip;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import jakarta.persistence.LockModeType;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -13,6 +16,12 @@ import java.util.List;
 
 @Repository
 public interface TripRepository extends JpaRepository<Trip, Long> {
+
+    /** Locks the trip row until the surrounding transaction completes. */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT t FROM Trip t WHERE t.tripId = :tripId")
+    Optional<Trip> findByIdForUpdate(@Param("tripId") Long tripId);
+
 
     List<Trip> findByTravelDate(LocalDate travelDate);
 
