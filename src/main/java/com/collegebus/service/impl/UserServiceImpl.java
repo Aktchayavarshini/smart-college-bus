@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.Locale;
 
 @Service
 @Transactional
@@ -39,11 +40,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public User registerUser(UserRegistrationDto dto) {
         if (dto == null) throw new IllegalArgumentException("Registration details are required.");
-        String email = dto.getEmail() == null ? "" : dto.getEmail().trim().toLowerCase();
+        String email = dto.getEmail() == null ? "" : dto.getEmail().trim().toLowerCase(Locale.ROOT);
         if (email.isBlank()) throw new IllegalArgumentException("Email is required.");
         if (userRepository.existsByEmail(email)) throw new IllegalArgumentException("An account with this email already exists.");
 
-        String role = dto.getRole() == null ? "" : dto.getRole().trim().toUpperCase();
+        String role = dto.getRole() == null ? "" : dto.getRole().trim().toUpperCase(Locale.ROOT);
         if (!"STUDENT".equals(role) && !"TEACHER".equals(role)) {
             throw new IllegalArgumentException("Only student and teacher self-registration is permitted.");
         }
@@ -99,13 +100,13 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+        return userRepository.findByEmail(email == null ? null : email.trim().toLowerCase(Locale.ROOT));
     }
 
     @Override
     @Transactional(readOnly = true)
     public User getByEmail(String email) {
-        return userRepository.findByEmail(email)
+        return userRepository.findByEmail(email == null ? null : email.trim().toLowerCase(Locale.ROOT))
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
     }
 
