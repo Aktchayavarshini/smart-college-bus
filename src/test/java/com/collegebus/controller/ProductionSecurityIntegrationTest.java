@@ -10,9 +10,12 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.hamcrest.Matchers.containsString;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -33,6 +36,18 @@ class ProductionSecurityIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.headerName").value("X-CSRF-TOKEN"))
                 .andExpect(jsonPath("$.token").isNotEmpty());
+    }
+
+
+    @Test
+    void corsAllowsConfiguredCsrfHeaderForFrontendRequests() throws Exception {
+        mockMvc.perform(options("/api/v1/trips")
+                        .header("Origin", "https://example.test")
+                        .header("Access-Control-Request-Method", "POST")
+                        .header("Access-Control-Request-Headers", "Content-Type,X-CSRF-TOKEN"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Access-Control-Allow-Origin", "https://example.test"))
+                .andExpect(header().string("Access-Control-Allow-Headers", containsString("X-CSRF-TOKEN")));
     }
 
     @Test
