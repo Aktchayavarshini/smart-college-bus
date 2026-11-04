@@ -134,7 +134,12 @@ public class TripServiceImpl implements TripService {
     @Transactional(readOnly = true)
     public List<TripCardDto> searchTrips(BusSearchDto searchDto) {
         LocalDate date = searchDto.getTravelDate() != null ? searchDto.getTravelDate() : LocalDate.now();
-        List<Trip> scheduledTrips = tripRepository.findByTravelDateAndTripStatus(date, "SCHEDULED");
+        List<Trip> scheduledTrips = tripRepository.findByTravelDateAndTripStatus(date, "SCHEDULED")
+                .stream()
+                .filter(t -> "ACTIVE".equalsIgnoreCase(t.getBus().getBusStatus()))
+                .filter(t -> "ACTIVE".equalsIgnoreCase(t.getRoute().getRouteStatus()))
+                .filter(t -> "ACTIVE".equalsIgnoreCase(t.getDriver().getDriverStatus()))
+                .toList();
 
         // Filter by preferred time slot if provided
         String slot = searchDto.getPreferredTimeSlot();
