@@ -1,5 +1,5 @@
 -- PRODUCTION SCHEMA-ONLY SCRIPT
--- Destructive: drops and recreates application tables. Run ONLY against a newly provisioned empty database.
+-- Non-destructive: creates missing tables only. Existing tables and records are never dropped or modified.
 -- Contains no sample users, default passwords, bookings, or demo fleet data.
 
 -- =====================================================================
@@ -16,30 +16,13 @@ CREATE DATABASE IF NOT EXISTS CollegeBusDB
 
 USE CollegeBusDB;
 
--- Disable foreign key checks during schema drops/recreations
-SET FOREIGN_KEY_CHECKS = 0;
-
-DROP TABLE IF EXISTS seat_requests;
-DROP TABLE IF EXISTS bookings;
-DROP TABLE IF EXISTS route_stops;
-DROP TABLE IF EXISTS trips;
-DROP TABLE IF EXISTS buses;
-DROP TABLE IF EXISTS drivers;
-DROP TABLE IF EXISTS bus_stops;
-DROP TABLE IF EXISTS routes;
-DROP TABLE IF EXISTS exam_timetable;
-DROP TABLE IF EXISTS academic_timetable;
-DROP TABLE IF EXISTS teachers;
-DROP TABLE IF EXISTS students;
-DROP TABLE IF EXISTS users;
-
-SET FOREIGN_KEY_CHECKS = 1;
+-- Existing tables are intentionally preserved; schema migrations must be reviewed separately.
 
 -- =====================================================================
 -- TABLE 1: users
 -- Stores all system user accounts (Students, Teachers, Transport Admins)
 -- =====================================================================
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     user_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     full_name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL,
@@ -58,7 +41,7 @@ CREATE TABLE users (
 -- TABLE 2: students
 -- One-to-One relationship with users table for student-specific info
 -- =====================================================================
-CREATE TABLE students (
+CREATE TABLE IF NOT EXISTS students (
     student_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
     roll_number VARCHAR(50) NOT NULL,
@@ -77,7 +60,7 @@ CREATE TABLE students (
 -- TABLE 3: teachers
 -- One-to-One relationship with users table for faculty-specific info
 -- =====================================================================
-CREATE TABLE teachers (
+CREATE TABLE IF NOT EXISTS teachers (
     teacher_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
     employee_id VARCHAR(50) NOT NULL,
@@ -93,7 +76,7 @@ CREATE TABLE teachers (
 -- TABLE 4: buses
 -- Bus fleet management including capacity and operational status
 -- =====================================================================
-CREATE TABLE buses (
+CREATE TABLE IF NOT EXISTS buses (
     bus_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     bus_number VARCHAR(50) NOT NULL COMMENT 'e.g., BUS-101, BUS-102',
     registration_number VARCHAR(50) NOT NULL COMMENT 'e.g., TN-01-AB-1234',
@@ -110,7 +93,7 @@ CREATE TABLE buses (
 -- TABLE 5: drivers
 -- Driver records and contact details
 -- =====================================================================
-CREATE TABLE drivers (
+CREATE TABLE IF NOT EXISTS drivers (
     driver_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     driver_name VARCHAR(100) NOT NULL,
     phone_number VARCHAR(20) NOT NULL,
@@ -124,7 +107,7 @@ CREATE TABLE drivers (
 -- TABLE 6: routes
 -- Defined bus transportation routes connecting college to various areas
 -- =====================================================================
-CREATE TABLE routes (
+CREATE TABLE IF NOT EXISTS routes (
     route_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     route_name VARCHAR(100) NOT NULL,
     source VARCHAR(100) NOT NULL,
@@ -138,7 +121,7 @@ CREATE TABLE routes (
 -- TABLE 7: bus_stops
 -- Master repository of approved college bus stops with locality names
 -- =====================================================================
-CREATE TABLE bus_stops (
+CREATE TABLE IF NOT EXISTS bus_stops (
     stop_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     stop_name VARCHAR(100) NOT NULL,
     location_description VARCHAR(255) NULL,
@@ -152,7 +135,7 @@ CREATE TABLE bus_stops (
 -- TABLE 8: route_stops
 -- Junction table mapping stops to routes with sequence and estimated travel times
 -- =====================================================================
-CREATE TABLE route_stops (
+CREATE TABLE IF NOT EXISTS route_stops (
     route_stop_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     route_id BIGINT NOT NULL,
     stop_id BIGINT NOT NULL,
@@ -170,7 +153,7 @@ CREATE TABLE route_stops (
 -- TABLE 9: trips
 -- Scheduled journeys combining a Bus, Route, Driver, Date and Time slot
 -- =====================================================================
-CREATE TABLE trips (
+CREATE TABLE IF NOT EXISTS trips (
     trip_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     bus_id BIGINT NOT NULL,
     route_id BIGINT NOT NULL,
@@ -194,7 +177,7 @@ CREATE TABLE trips (
 -- TABLE 10: bookings
 -- Confirmed and cancelled student/teacher seat reservations
 -- =====================================================================
-CREATE TABLE bookings (
+CREATE TABLE IF NOT EXISTS bookings (
     booking_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
     trip_id BIGINT NOT NULL,
@@ -217,7 +200,7 @@ CREATE TABLE bookings (
 -- TABLE 11: seat_requests
 -- Requests placed by passengers when a bus trip is already full
 -- =====================================================================
-CREATE TABLE seat_requests (
+CREATE TABLE IF NOT EXISTS seat_requests (
     request_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
     trip_id BIGINT NOT NULL,
@@ -240,7 +223,7 @@ CREATE TABLE seat_requests (
 -- TABLE 12: academic_timetable
 -- College class schedule for department, academic year and semester
 -- =====================================================================
-CREATE TABLE academic_timetable (
+CREATE TABLE IF NOT EXISTS academic_timetable (
     timetable_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     department VARCHAR(100) NOT NULL,
     academic_year INT NOT NULL,
@@ -257,7 +240,7 @@ CREATE TABLE academic_timetable (
 -- TABLE 13: exam_timetable
 -- College examination schedule used for return bus trip recommendations
 -- =====================================================================
-CREATE TABLE exam_timetable (
+CREATE TABLE IF NOT EXISTS exam_timetable (
     exam_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     department VARCHAR(100) NOT NULL,
     academic_year INT NOT NULL,
