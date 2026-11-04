@@ -48,7 +48,7 @@ public class CollegeBusDBConnection {
 
         boolean production = isProductionProfile();
         if (production && (url == null || url.isBlank() || user == null || user.isBlank() || pass == null || pass.isBlank())) {
-            throw new DatabaseOperationException("Production JDBC access requires DB_URL, DB_USERNAME and DB_PASSWORD. Embedded fallback is disabled.");
+            throw new DatabaseOperationException("Production JDBC access requires DB_URL, DB_USERNAME and DB_PASSWORD. Embedded fallback is disabled.", null);
         }
         if (url == null || url.trim().isEmpty()) url = DEFAULT_MYSQL_URL;
         if (user == null) user = DEFAULT_MYSQL_USER;
