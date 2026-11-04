@@ -36,8 +36,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public synchronized Booking bookSeat(User user, BookingRequestDto dto) {
-        Trip trip = tripRepository.findById(dto.getTripId())
+    public Booking bookSeat(User user, BookingRequestDto dto) {
+        Trip trip = tripRepository.findByIdForUpdate(dto.getTripId())
                 .orElseThrow(() -> new ResourceNotFoundException("Trip not found with ID: " + dto.getTripId()));
 
         if (!"SCHEDULED".equalsIgnoreCase(trip.getTripStatus())) {
@@ -115,7 +115,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public synchronized Booking modifyBooking(Long currentBookingId, BookingRequestDto newBookingDto, User currentUser) {
+    public Booking modifyBooking(Long currentBookingId, BookingRequestDto newBookingDto, User currentUser) {
         Booking currentBooking = getBookingById(currentBookingId);
 
         if (!currentBooking.getUser().getUserId().equals(currentUser.getUserId()) && !"ADMIN".equalsIgnoreCase(currentUser.getRole())) {
