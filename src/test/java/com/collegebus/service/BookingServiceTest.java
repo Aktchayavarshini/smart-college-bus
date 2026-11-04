@@ -135,6 +135,7 @@ class BookingServiceTest {
         booking.setBookingId(300L);
 
         when(bookingRepository.findById(300L)).thenReturn(Optional.of(booking));
+        when(tripRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(trip));
         when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Booking cancelled = bookingService.cancelBooking(300L, studentUser);
