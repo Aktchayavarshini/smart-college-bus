@@ -125,7 +125,6 @@ public class TransitQueryApiController {
             LocalTime arrivalTime,
             Integer availableSeats,
             Integer totalSeats,
-            String driverName,
             String pickupStopName,
             String dropoffStopName,
             Integer estimatedTravelMinutes) {
@@ -142,7 +141,6 @@ public class TransitQueryApiController {
                     trip.getArrivalTime(),
                     trip.getAvailableSeats(),
                     trip.getTotalSeats(),
-                    trip.getDriverName(),
                     trip.getPickupStopName(),
                     trip.getDropoffStopName(),
                     trip.getEstimatedTravelMinutes());
