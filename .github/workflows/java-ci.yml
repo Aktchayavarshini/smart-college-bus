@@ -31,3 +31,5 @@ jobs:
           cache: maven
       - name: Run Maven tests
         run: bash ./mvnw --batch-mode --no-transfer-progress clean verify
+      - name: Build production container image
+        run: docker build --tag smart-college-bus:ci .
