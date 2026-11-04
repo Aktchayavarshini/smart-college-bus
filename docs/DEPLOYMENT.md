@@ -63,7 +63,7 @@ Production JDBC demonstration access fails closed: it requires explicit `DB_URL`
 
 Production session cookies are Secure, HttpOnly, and SameSite=None so a separately hosted browser frontend can send the session cross-site. The browser must use `credentials: "include"`, and the backend must allow only the exact `FRONTEND_ORIGIN`.
 
-Spring Security uses a readable CSRF cookie and the `X-XSRF-TOKEN` header. The frontend should first call `GET /api/v1/csrf` with credentials, then send the returned header name/token on unsafe requests. Booking mutations are not yet exposed under `/api/v1`; this is groundwork, not a claim that the Next.js auth flow is complete.
+Spring Security uses a readable CSRF cookie and the `X-CSRF-TOKEN` header. The frontend should first call `GET /api/v1/csrf` with credentials, then send the returned header name/token on unsafe requests. Booking mutations are not yet exposed under `/api/v1`; this is groundwork, not a claim that the Next.js auth flow is complete.
 
 ## CI
 
