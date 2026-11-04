@@ -48,7 +48,7 @@ Returns a CSRF token for browser clients using the Spring session.
 
 ```json
 {
-  "headerName": "X-XSRF-TOKEN",
+  "headerName": "X-CSRF-TOKEN",
   "token": "..."
 }
 ```
