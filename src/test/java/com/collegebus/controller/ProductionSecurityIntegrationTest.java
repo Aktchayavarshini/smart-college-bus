@@ -31,7 +31,7 @@ class ProductionSecurityIntegrationTest {
     void csrfBootstrapEndpointIsPublic() throws Exception {
         mockMvc.perform(get("/api/v1/csrf"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.headerName").value("X-XSRF-TOKEN"))
+                .andExpect(jsonPath("$.headerName").value("X-CSRF-TOKEN"))
                 .andExpect(jsonPath("$.token").isNotEmpty());
     }
 
