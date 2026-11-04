@@ -31,7 +31,7 @@ Query parameters:
 - `pickupStopId` (optional)
 - `dropoffStopId` (optional)
 
-Returns a privacy-minimised `TripResponse`: trip and bus identifiers, route, travel date, departure/arrival, driver display name, seat counts, pickup/drop-off names, and estimated travel duration. Driver phone numbers and internal booking fields are not exposed.
+Returns a privacy-minimised `TripResponse`: trip and bus identifiers, route, travel date, departure/arrival, seat counts, pickup/drop-off names, and estimated travel duration. Driver names, phone numbers, and internal booking fields are not exposed by the public API.
 
 Past travel dates return HTTP 400.
 
