@@ -63,8 +63,11 @@ public class SecurityConfig {
                 .requestMatchers("/student/**").hasAnyRole("STUDENT", "ADMIN")
                 .requestMatchers("/teacher/**").hasAnyRole("TEACHER", "ADMIN")
                 // Authenticated features
-                .requestMatchers("/booking/**", "/my-bookings", "/booking-history", "/seat-request/**", "/profile", "/academic-timetable", "/exam-timetable").authenticated()
-                .anyRequest().authenticated()
+                .requestMatchers("/booking/**", "/my-bookings", "/booking-history", "/seat-request/**", "/profile", "/academic-timetable", "/exam-timetable").authenticated();
+                if (environment.acceptsProfiles(Profiles.of("dev"))) {
+                    auth.requestMatchers("/h2-console/**").permitAll();
+                }
+                auth.anyRequest().authenticated();
             )
             .formLogin(form -> form
                 .loginPage("/login")
@@ -85,9 +88,12 @@ public class SecurityConfig {
             .exceptionHandling(ex -> ex
                 .accessDeniedPage("/access-denied")
             )
-            .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/api/chatbot/**", "/api/oop/**")
-            )
+            .csrf(csrf -> {
+                csrf.ignoringRequestMatchers("/api/chatbot/**", "/api/oop/**");
+                if (environment.acceptsProfiles(Profiles.of("dev"))) {
+                    csrf.ignoringRequestMatchers("/h2-console/**");
+                }
+            })
 
             .sessionManagement(session -> session
                 .maximumSessions(2)
@@ -95,8 +101,6 @@ public class SecurityConfig {
             );
 
         if (environment.acceptsProfiles(Profiles.of("dev"))) {
-            http.authorizeHttpRequests(auth -> auth.requestMatchers("/h2-console/**").permitAll());
-            http.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"));
             http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
         }
 
