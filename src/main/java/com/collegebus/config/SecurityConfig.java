@@ -53,22 +53,22 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authenticationProvider(authenticationProvider())
-            .authorizeHttpRequests(auth -> auth
+            .authorizeHttpRequests(auth -> {
                 // Static resources
-                .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico").permitAll()
+                auth.requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico").permitAll();
                 // Public landing, search, chatbot REST API, and OOP Architecture Demo
-                .requestMatchers("/", "/login", "/register", "/calendar", "/select-slot", "/find-bus", "/bus-details/**", "/api/chatbot/**", "/talk-to-aadhi", "/oop-demo", "/api/oop/**").permitAll()
+                auth.requestMatchers("/", "/login", "/register", "/calendar", "/select-slot", "/find-bus", "/bus-details/**", "/api/chatbot/**", "/talk-to-aadhi", "/oop-demo", "/api/oop/**").permitAll();
                 // Role-based restrictions
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/student/**").hasAnyRole("STUDENT", "ADMIN")
-                .requestMatchers("/teacher/**").hasAnyRole("TEACHER", "ADMIN")
+                auth.requestMatchers("/admin/**").hasRole("ADMIN");
+                auth.requestMatchers("/student/**").hasAnyRole("STUDENT", "ADMIN");
+                auth.requestMatchers("/teacher/**").hasAnyRole("TEACHER", "ADMIN");
                 // Authenticated features
-                .requestMatchers("/booking/**", "/my-bookings", "/booking-history", "/seat-request/**", "/profile", "/academic-timetable", "/exam-timetable").authenticated();
+                auth.requestMatchers("/booking/**", "/my-bookings", "/booking-history", "/seat-request/**", "/profile", "/academic-timetable", "/exam-timetable").authenticated();
                 if (environment.acceptsProfiles(Profiles.of("dev"))) {
                     auth.requestMatchers("/h2-console/**").permitAll();
                 }
                 auth.anyRequest().authenticated();
-            )
+            })
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
