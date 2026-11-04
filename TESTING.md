@@ -1,83 +1,58 @@
-# SMART COLLEGE BUS ALLOCATION SYSTEM - TEST SUITE SPECIFICATION
+# SMART COLLEGE BUS ALLOCATION SYSTEM — TEST STRATEGY
 
----
+## 1. Automated test coverage
 
-## 1. Test Strategy Overview
-The testing phase verifies functional correctness, data integrity, concurrency safety, and user interface responsiveness across all 24 views and modules of the Smart College Bus Allocation System.
+The repository currently contains 25 JUnit 5 tests across the following suites:
 
-### Test Layers
-1. **Unit Testing:** JUnit 5 and Mockito testing core service layer business rules (`BookingService`, `ChatbotService`, `TimetableService`).
-2. **Integration Testing:** Spring Boot Test and Spring Security Test validating repository JPA mappings and security filter chain rules.
-3. **Database Concurrency Testing:** Verification of transaction isolation, capacity limits, and duplicate booking prevention.
-4. **Manual & UI End-to-End Testing:** Verification of forms, date/time slot navigation, responsive layouts, and floating Talk to Aadhi widget interactions.
+| Test suite | Tests | Coverage |
+|---|---:|---|
+| `SmartCollegeBusApplicationTests` | 1 | Spring application context and JPA startup under the isolated `test` profile |
+| `BookingServiceTest` | 4 | Successful booking, capacity rejection, duplicate booking rejection, and cancellation |
+| `ChatbotServiceTest` | 3 | Greeting, booking guidance, and locality search |
+| `OOPConceptsTest` | 8 | Encapsulation, inheritance, polymorphism, abstraction, and exception behavior |
+| `JdbcDatabaseCrudTest` | 3 | JDBC connection, CRUD lifecycle, and transaction behavior |
+| `UserServiceImplTest` | 2 | Rejects privileged and unknown self-registration roles before persistence |
+| `ProductionSecurityIntegrationTest` | 4 | Public read API, CSRF bootstrap, admin authentication boundary, and development-only JDBC demo boundary |
+| **Total** | **25** | **Unit and Spring integration coverage** |
 
----
-
-## 2. Automated Unit Test Cases (`src/test/java/com/collegebus/`)
-
-| Test ID | Class | Method Tested | Test Description | Expected Result | Status |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **TC-UNIT-01** | `SmartCollegeBusApplicationTests` | `contextLoads()` | Boots Spring context against test configuration profile | Context loads without bean errors | **PASSED** |
-| **TC-UNIT-02** | `BookingServiceTest` | `testBookSeat_Success()` | Books a valid seat when bus has remaining capacity | Booking created with `CONFIRMED` status | **PASSED** |
-| **TC-UNIT-03** | `BookingServiceTest` | `testBookSeat_FullBus_ThrowsException()` | Attempts booking when `confirmedCount == totalSeats` | Throws `BookingException` with message "Bus is full" | **PASSED** |
-| **TC-UNIT-04** | `BookingServiceTest` | `testBookSeat_DuplicateBooking_ThrowsException()` | Attempts active booking when user already holds a ticket on trip | Throws `BookingException` preventing double booking | **PASSED** |
-| **TC-UNIT-05** | `BookingServiceTest` | `testCancelBooking_Success()` | Cancels confirmed booking | Booking status changes to `CANCELLED`, seat released | **PASSED** |
-| **TC-UNIT-06** | `ChatbotServiceTest` | `testProcessGreeting()` | Sends "Hello Aadhi" query | Returns greeting, suggestions, and DB assistant role | **PASSED** |
-| **TC-UNIT-07** | `ChatbotServiceTest` | `testProcessBookingHelp()` | Asks "How do I book a seat?" | Returns 3-step booking guidance and `/find-bus` action link | **PASSED** |
-| **TC-UNIT-08** | `ChatbotServiceTest` | `testProcessLocalitySearch_Pallavaram()` | Queries "Find bus to Pallavaram" | Analyzes stop sequence, routes, and departure times | **PASSED** |
-| **TC-OOP-01** | `OOPConceptsTest` | `testEncapsulation_CapacityBoundaryValidation()` | Tests capacity mutators with negative, zero, and excessive values | Throws `InvalidDataException`, protects state invariants | **PASSED** |
-| **TC-OOP-02** | `OOPConceptsTest` | `testEncapsulation_PersonDataIntegrity()` | Tests email regex and phone privacy masking | Formats masked phone `******3210`, blocks bad email | **PASSED** |
-| **TC-OOP-03** | `OOPConceptsTest` | `testInheritance_VehicleAndPersonHierarchies()` | Instantiates `AirConditionedBus`, `StandardCollegeBus`, `StudentPassenger` | Subclasses inherit and specialize base properties | **PASSED** |
-| **TC-OOP-04** | `OOPConceptsTest` | `testPolymorphism_CompileTimeMethodOverloading()` | Evaluates 3 overloaded `calculateFare` methods (1, 2, 3 params) | Computes standard, peak, and concession fares | **PASSED** |
-| **TC-OOP-05** | `OOPConceptsTest` | `testPolymorphism_RuntimeDynamicMethodDispatch()` | Analyzes fleet cost iterating on `List<AbstractVehicle>` | Dispatches subclass cost calculations dynamically | **PASSED** |
-| **TC-OOP-06** | `OOPConceptsTest` | `testAbstraction_BookableContract()` | Tests `reserveSeat()` and `releaseSeat()` on `Bookable` interface | Correctly reserves, releases, and reports seat state | **PASSED** |
-| **TC-OOP-07** | `OOPConceptsTest` | `testExceptionHandling_CustomExceptions()` | Tests `SeatNotAvailableException` and `DuplicateBookingException` | Custom checked exceptions thrown and caught | **PASSED** |
-| **TC-DBMS-01** | `JdbcDatabaseCrudTest` | `testJdbcConnection_Metadata()` | Establishes raw JDBC connection and inspects DB metadata | Active `java.sql.Connection` verified | **PASSED** |
-| **TC-DBMS-02** | `JdbcDatabaseCrudTest` | `testBusCrudLifecycle()` | Executes full Create, Read, Update, Delete on `buses` table | All 4 CRUD operations execute successfully via JDBC | **PASSED** |
-| **TC-DBMS-03** | `JdbcDatabaseCrudTest` | `testTransactionalBooking()` | Executes ACID transactional seat reservation with commit/rollback | Transaction atomicity verified | **PASSED** |
-
-> **Total Automated Tests:** **19 Passed, 0 Failed, 0 Skipped (100% Pass Rate)**
-
----
-
-## 3. Concurrency & Transactional Verification
-
-### Test Case: Simultaneous Booking Attempts on Last Available Seat
-- **Scenario:** Bus `BUS-104` has 1 remaining seat. Two users submit concurrent booking requests simultaneously.
-- **Mechanism:** `BookingServiceImpl.bookSeat()` executes with `synchronized` isolation and `@Transactional(isolation = Isolation.SERIALIZABLE)`.
-- **Observed Result:** First transaction completes successfully and decrements remaining seat count to 0. Second transaction detects `confirmedCount >= totalSeats` and raises `BookingException`, cleanly directing the second user to alternative buses or the Seat Request waitlist.
-- **Verification:** Overbooking is physically impossible in the database.
-
----
-
-## 4. Manual Functional Test Matrix
-
-| Module | Feature Tested | Input Given | Expected Output | Status |
-| :--- | :--- | :--- | :--- | :--- |
-| **Auth** | Student Registration | Roll No: `714021104005`, Email: `test@collegebus.edu` | Registered successfully; redirect to login | Verified |
-| **Auth** | Duplicate Email Check | Existing email: `student@collegebus.edu` | Error alert: "An account with email already exists" | Verified |
-| **Auth** | Admin Direct Registration | Role set to `ADMIN` on public form | Server blocks registration (Admins provisioned only) | Verified |
-| **Date Selection** | Past Date Picker | Selected yesterday's date | Blocked by HTML5 `min` attribute & backend validation | Verified |
-| **Slot Selection** | Travel Slot Pick | Selected `07:00 AM` for `2026-11-03` | Continues to matching buses filtered to morning window | Verified |
-| **Bus Search** | Flexible Stop Route Filter | Pickup: `Pallavaram`, Destination: `Campus` | Shows Route 101 buses; verifies stop sequence order | Verified |
-| **Seat Request** | Overflow Waitlist | Click "Request a Seat" on full bus | Record created in `seat_requests` with `PENDING` status | Verified |
-| **Admin** | Approve Seat Request | Admin clicks "Approve" | Checks capacity, approves request, creates confirmed booking | Verified |
-| **Exam Timetable** | Return Bus Recommendation | Exam ends at `11:30 AM` | Recommends `12:00 PM` return bus with 1-click book | Verified |
-| **Analytics** | Passenger-Demand Reports | Admin navigates to `/admin/reports` | Computes route occupancy %, flags Pallavaram corridor | Verified |
-| **Aadhi Chatbot** | Floating Chat Widget | Clicks widget, asks "Pallavaram buses" | Queries live MySQL routes, stops, and seat counts | Verified |
-
----
-
-## 5. Test Execution Commands
+Run the same verification used by CI:
 
 ```bash
-# Execute full Maven automated test suite
-mvn test
-
-# Run tests with detailed test report output
-mvn surefire-report:report
-
-# Package verified production artifact
-mvn clean package -DskipTests=false
+bash ./mvnw --batch-mode --no-transfer-progress clean verify
 ```
 
+GitHub Actions runs Java verification and the Next.js production build separately. Check the latest runs on `rebuild/production-upgrade`; older successful runs do not certify later commits. A green build confirms compilation and the automated tests above, not a complete production deployment.
+
+## 2. Concurrency and transactional controls
+
+`BookingServiceImpl.bookSeat()` and cancellation acquire a pessimistic write lock on the trip row inside the transaction. Booking also uses serializable isolation, checks active duplicate bookings, validates trip resources and stop order, and calculates capacity from confirmed database records.
+
+**Important test limitation:** the current automated booking tests use Mockito and do not create simultaneous transactions against a real MySQL server. Before production traffic, run a MySQL integration/load test with concurrent booking and cancellation requests for the final available seat, then verify that confirmed bookings never exceed bus capacity.
+
+## 3. Manual end-to-end test plan
+
+The following workflows still require browser testing against a provisioned database and deployed backend. They are not marked as verified by the current CI suite.
+
+| Area | Required check | Status |
+|---|---|---|
+| Registration | Student and teacher registration, duplicate identities, invalid role and password validation | Not run against production-like MySQL |
+| Authentication | Login, logout, inactive account rejection, and role-specific redirects | Not run end-to-end |
+| Trip discovery | Date, time slot, active stops, route direction, and inactive fleet filtering | API tests partial; browser test pending |
+| Booking | Reserve, duplicate prevention, cutoff, capacity, cancel, and modify | Unit tests; MySQL concurrency test pending |
+| Seat requests | Submit, approve, reject, and concurrent approval | Manual integration test pending |
+| Student/teacher | Dashboards, timetables, exam recommendations, profile and booking history | Manual browser test pending |
+| Admin | Fleet, routes, stops, drivers, trips, booking audit and reports | Manual browser test pending |
+| Responsive UI | Mobile/tablet/desktop layouts and keyboard/accessibility checks | Manual browser test pending |
+| Production database | Apply schema-only SQL, verify Hibernate validation, and test backup/restore | Pending infrastructure |
+
+## 4. Production release gates
+
+- Latest Java CI and frontend CI must pass on the exact release commit.
+- Run integration tests against MySQL 8, not only H2.
+- Run concurrent booking/cancellation tests against MySQL.
+- Complete browser end-to-end testing for every role and critical workflow.
+- Provision the production database and Java backend host; set secrets outside source control.
+- Verify HTTPS, session cookies, CORS origin, CSRF behavior, database backups, monitoring, and restore procedure.
+- Confirm administrator provisioning and remove all development/demo accounts.
+
+Until these gates are completed, treat the branch as a hardened release candidate, not a live production deployment.
