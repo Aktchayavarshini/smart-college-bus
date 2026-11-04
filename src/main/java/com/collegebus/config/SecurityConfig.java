@@ -2,6 +2,8 @@ package com.collegebus.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -19,11 +21,14 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
     private final CustomAuthenticationSuccessHandler successHandler;
+    private final Environment environment;
 
     public SecurityConfig(CustomUserDetailsService userDetailsService,
-                          CustomAuthenticationSuccessHandler successHandler) {
+                          CustomAuthenticationSuccessHandler successHandler,
+                          Environment environment) {
         this.userDetailsService = userDetailsService;
         this.successHandler = successHandler;
+        this.environment = environment;
     }
 
     @Bean
@@ -52,7 +57,7 @@ public class SecurityConfig {
                 // Static resources
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico").permitAll()
                 // Public landing, search, chatbot REST API, and OOP Architecture Demo
-                .requestMatchers("/", "/login", "/register", "/calendar", "/select-slot", "/find-bus", "/bus-details/**", "/api/chatbot/**", "/talk-to-aadhi", "/oop-demo", "/api/oop/**", "/h2-console/**").permitAll()
+                .requestMatchers("/", "/login", "/register", "/calendar", "/select-slot", "/find-bus", "/bus-details/**", "/api/chatbot/**", "/talk-to-aadhi", "/oop-demo", "/api/oop/**").permitAll()
                 // Role-based restrictions
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/student/**").hasAnyRole("STUDENT", "ADMIN")
@@ -81,13 +86,19 @@ public class SecurityConfig {
                 .accessDeniedPage("/access-denied")
             )
             .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/api/chatbot/**", "/api/oop/**", "/h2-console/**")
+                .ignoringRequestMatchers("/api/chatbot/**", "/api/oop/**")
             )
-            .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+
             .sessionManagement(session -> session
                 .maximumSessions(2)
                 .maxSessionsPreventsLogin(false)
             );
+
+        if (environment.acceptsProfiles(Profiles.of("dev"))) {
+            http.authorizeHttpRequests(auth -> auth.requestMatchers("/h2-console/**").permitAll());
+            http.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"));
+            http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+        }
 
         return http.build();
     }
