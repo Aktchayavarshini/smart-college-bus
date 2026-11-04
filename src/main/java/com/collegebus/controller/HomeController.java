@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 @Controller
@@ -105,7 +106,7 @@ public class HomeController {
     @GetMapping("/calendar")
     public String monthlyCalendar(Model model) {
         model.addAttribute("currentUser", userService.getAuthenticatedUser());
-        model.addAttribute("minDate", LocalDate.now());
+        model.addAttribute("minDate", LocalDate.now(ZoneId.of("Asia/Kolkata")));
         return "calendar";
     }
 
@@ -150,6 +151,13 @@ public class HomeController {
                              @RequestParam(value = "dropoff", required = false) Long dropoffStopId,
                              Model model) {
         Trip trip = tripService.getTripById(tripId);
+        if (!"SCHEDULED".equalsIgnoreCase(trip.getTripStatus())
+                || !"ACTIVE".equalsIgnoreCase(trip.getBus().getBusStatus())
+                || !"ACTIVE".equalsIgnoreCase(trip.getRoute().getRouteStatus())
+                || !"ACTIVE".equalsIgnoreCase(trip.getDriver().getDriverStatus())
+                || trip.getTravelDate().isBefore(LocalDate.now(ZoneId.of("Asia/Kolkata")))) {
+            return "redirect:/calendar";
+        }
         TripCardDto card = tripService.getTripCardById(tripId, pickupStopId, dropoffStopId);
         List<RouteStop> routeStops = routeService.getRouteStops(trip.getRoute().getRouteId());
         List<TripCardDto> alternativeTrips = tripService.findAlternativeTrips(tripId);
