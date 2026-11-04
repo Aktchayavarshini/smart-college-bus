@@ -1,8 +1,8 @@
-# Multi-stage Java 17 build; runtime image contains only the packaged Spring Boot application.
+# Multi-stage Java 17 build; CI runs tests against MySQL before building this image.
 FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /workspace
 COPY . .
-RUN bash ./mvnw --batch-mode --no-transfer-progress clean package -DskipTests=false
+RUN bash ./mvnw --batch-mode --no-transfer-progress clean package -DskipTests
 
 FROM eclipse-temurin:17-jre
 WORKDIR /app
