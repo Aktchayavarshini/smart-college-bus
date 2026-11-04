@@ -493,11 +493,12 @@ The application contains comprehensive unit and integration test suites executed
    - Validates locality queries, booking guidance, and alternative route suggestions.
 5. **`UserServiceImplTest.java` (2 Test Cases):** Rejects privileged and unknown self-registration roles before persistence.
 6. **`ProductionSecurityIntegrationTest.java` (4 Test Cases):** Checks public transit API access, CSRF bootstrap, admin authentication, and development-only JDBC demo access.
+7. **`ProductionProfileSchemaValidationTest.java` (1 Test Case):** Boots the production profile against the MySQL 8 schema-only database provisioned by CI.
 7. **`SmartCollegeBusApplicationTests.java` (1 Test Case):**
    - Verifies Spring Boot ApplicationContext initialization and entity mapping.
 
 #### Test Execution Result:
-The repository now contains 25 automated tests, including registration-role and Spring Security integration tests. The current CI result must be checked on the exact release commit; this report does not claim that manual browser tests or production MySQL concurrency tests have been completed.
+The repository now contains 26 automated tests, including registration-role checks, Spring Security integration tests, and a production-profile startup test against MySQL 8. The current CI result must be checked on the exact release commit; this report does not claim that manual browser tests or production MySQL concurrency tests have been completed.
 
 ---
 
