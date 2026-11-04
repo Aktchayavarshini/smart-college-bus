@@ -476,7 +476,7 @@ In `JdbcBusDao.mapResultSetToBus(ResultSet rs)`:
 
 The application contains comprehensive unit and integration test suites executed with JUnit 5 and Mockito:
 
-1. **`OOPConceptsTest.java` (7 Test Cases):**
+1. **`OOPConceptsTest.java` (8 Test Cases):**
    - Validates Encapsulation boundary checks and email regex validation.
    - Validates multi-level Inheritance on Vehicles and Persons.
    - Validates compile-time Method Overloading on `calculateFare`.
@@ -487,11 +487,13 @@ The application contains comprehensive unit and integration test suites executed
    - Validates raw JDBC Connection metadata.
    - Validates Create, Read, Update, and Delete operations on the `buses` table.
    - Validates ACID Transactional booking creation and rollback.
-3. **`BookingServiceTest.java` (5 Test Cases):**
+3. **`BookingServiceTest.java` (4 Test Cases):**
    - Tests capacity constraints, duplicate booking prevention, and transactional cancellation.
 4. **`ChatbotServiceTest.java` (3 Test Cases):**
    - Validates locality queries, booking guidance, and alternative route suggestions.
-5. **`SmartCollegeBusApplicationTests.java` (1 Test Case):**
+5. **`UserServiceImplTest.java` (2 Test Cases):** Rejects privileged and unknown self-registration roles before persistence.
+6. **`ProductionSecurityIntegrationTest.java` (4 Test Cases):** Checks public transit API access, CSRF bootstrap, admin authentication, and development-only JDBC demo access.
+7. **`SmartCollegeBusApplicationTests.java` (1 Test Case):**
    - Verifies Spring Boot ApplicationContext initialization and entity mapping.
 
 #### Test Execution Result:
@@ -503,7 +505,7 @@ The application contains comprehensive unit and integration test suites executed
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
 ```
-**19 out of 19 test cases pass with 0 failures and 0 errors.**
+The repository now contains 25 automated tests, including registration-role and Spring Security integration tests. The current CI result must be checked on the exact release commit; this report does not claim that manual browser tests or production MySQL concurrency tests have been completed.
 
 ---
 
@@ -528,9 +530,9 @@ java -cp "target/classes;target/dependency/*" com.collegebus.oop.runner.OOPAndDB
 6. **DBMS Direct JDBC:** Show the live JDBC `INSERT`, `SELECT`, `UPDATE`, `DELETE`, and row count queries on `CollegeBusDB`.
 
 #### Demonstration Step 2: Interactive Web Architecture Portal
-1. Start the application:
+1. Start the application in local development mode:
    ```bash
-   ./mvnw spring-boot:run
+   SPRING_PROFILES_ACTIVE=dev ./mvnw spring-boot:run
    ```
 2. Open browser at `http://localhost:8080/oop-demo`.
 3. Click the yellow **"Run Live OOP & JDBC CRUD Test"** button.
