@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Locale;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -21,14 +22,14 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email == null ? null : email.trim().toLowerCase(Locale.ROOT))
                 .orElseThrow(() -> new UsernameNotFoundException("No user found with email: " + email));
 
         if (!"ACTIVE".equalsIgnoreCase(user.getAccountStatus())) {
             throw new UsernameNotFoundException("User account is inactive or suspended: " + email);
         }
 
-        String roleName = user.getRole().toUpperCase();
+        String roleName = user.getRole().toUpperCase(Locale.ROOT);
         if (!roleName.startsWith("ROLE_")) {
             roleName = "ROLE_" + roleName;
         }
