@@ -7,16 +7,17 @@ import com.collegebus.service.TripService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
-import java.util.Map;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Read-only transit discovery API for the Next.js client.
- * Booking and account mutations remain on the authenticated MVC routes
- * until the API authentication contract is introduced.
+ * Public, read-only transit discovery API for the Next.js client.
+ * Personal driver contact information is deliberately excluded from responses.
+ * Booking and account mutations remain on authenticated MVC routes.
  */
 @RestController
 @RequestMapping("/api/v1")
@@ -48,34 +49,71 @@ public class TransitQueryApiController {
     }
 
     @GetMapping("/trips")
-    public ResponseEntity<List<TripCardDto>> searchTrips(
+    public ResponseEntity<List<TripResponse>> searchTrips(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate travelDate,
             @RequestParam(defaultValue = "ALL") String preferredTimeSlot,
             @RequestParam(required = false) Long pickupStopId,
             @RequestParam(required = false) Long dropoffStopId) {
 
-        if (travelDate.isBefore(LocalDate.now())) {
+        if (travelDate.isBefore(LocalDate.now())
+                || (pickupStopId != null && pickupStopId.equals(dropoffStopId))) {
             return ResponseEntity.badRequest().build();
         }
 
         BusSearchDto criteria = new BusSearchDto(
                 travelDate, preferredTimeSlot, pickupStopId, dropoffStopId);
-        return ResponseEntity.ok(tripService.searchTrips(criteria));
+        return ResponseEntity.ok(tripService.searchTrips(criteria).stream()
+                .map(TripResponse::from)
+                .toList());
     }
 
     @GetMapping("/trips/{tripId}")
-    public ResponseEntity<TripCardDto> getTrip(
+    public ResponseEntity<TripResponse> getTrip(
             @PathVariable Long tripId,
             @RequestParam(required = false) Long pickupStopId,
             @RequestParam(required = false) Long dropoffStopId) {
-        return ResponseEntity.ok(
-                tripService.getTripCardById(tripId, pickupStopId, dropoffStopId));
+        if (pickupStopId != null && pickupStopId.equals(dropoffStopId)) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(TripResponse.from(
+                tripService.getTripCardById(tripId, pickupStopId, dropoffStopId)));
     }
 
-    public record StopResponse(
-            Long id,
-            String name,
-            String area,
-            String description) {
+    public record StopResponse(Long id, String name, String area, String description) {}
+
+    /** Stable, privacy-minimised public contract; never expose driver phone numbers. */
+    public record TripResponse(
+            Long tripId,
+            String busNumber,
+            String routeName,
+            String source,
+            String destination,
+            LocalDate travelDate,
+            LocalTime departureTime,
+            LocalTime arrivalTime,
+            Integer availableSeats,
+            Integer totalSeats,
+            String driverName,
+            String pickupStopName,
+            String dropoffStopName,
+            Integer estimatedTravelMinutes) {
+
+        static TripResponse from(TripCardDto trip) {
+            return new TripResponse(
+                    trip.getTripId(),
+                    trip.getBusNumber(),
+                    trip.getRouteName(),
+                    trip.getSource(),
+                    trip.getDestination(),
+                    trip.getTravelDate(),
+                    trip.getDepartureTime(),
+                    trip.getArrivalTime(),
+                    trip.getAvailableSeats(),
+                    trip.getTotalSeats(),
+                    trip.getDriverName(),
+                    trip.getPickupStopName(),
+                    trip.getDropoffStopName(),
+                    trip.getEstimatedTravelMinutes());
+        }
     }
 }
