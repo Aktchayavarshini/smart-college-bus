@@ -32,6 +32,14 @@ Do not commit production credentials. Use a least-privilege database account and
 
 Do not point the destructive SQL script at a database containing real user or booking data.
 
+## Production data and administrator provisioning
+
+The demo `DataInitializer` is restricted to the `dev` profile. Production startup never creates sample students, staff, buses, trips, or a default administrator. Provision real operational data through a reviewed, access-controlled database import or the authenticated admin workflows.
+
+Create the first administrator through a controlled one-time provisioning procedure: generate a BCrypt password hash using the application's configured `BCryptPasswordEncoder`, insert the administrator row with `role='ADMIN'` and `account_status='ACTIVE'`, then securely remove the temporary provisioning access. Never reuse the development demo credentials in production. Do not expose the JDBC/OOP CRUD demonstration endpoints in production; that controller is development-profile only.
+
+Production JDBC demonstration access fails closed: it requires explicit `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD` and will not silently switch to an ephemeral H2 database if MySQL is unavailable.
+
 ## Browser session and CSRF
 
 Production session cookies are Secure, HttpOnly, and SameSite=None so a separately hosted browser frontend can send the session cross-site. The browser must use `credentials: "include"`, and the backend must allow only the exact `FRONTEND_ORIGIN`.
