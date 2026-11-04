@@ -109,6 +109,9 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Booking cancelBooking(Long bookingId, User currentUser) {
         Booking booking = getBookingById(bookingId);
+        // Serialize cancellation with new reservations for the same trip.
+        tripRepository.findByIdForUpdate(booking.getTrip().getTripId())
+                .orElseThrow(() -> new ResourceNotFoundException("Trip not found: " + booking.getTrip().getTripId()));
 
         // Security check: Only owner or admin can cancel
         if (!booking.getUser().getUserId().equals(currentUser.getUserId()) && !"ADMIN".equalsIgnoreCase(currentUser.getRole())) {
