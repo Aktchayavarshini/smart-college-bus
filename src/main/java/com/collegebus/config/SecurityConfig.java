@@ -74,6 +74,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        CookieCsrfTokenRepository csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        csrfTokenRepository.setHeaderName("X-CSRF-TOKEN");
+
         http
             .cors(Customizer.withDefaults())
             .authenticationProvider(authenticationProvider())
@@ -114,7 +117,7 @@ public class SecurityConfig {
                 .accessDeniedPage("/access-denied")
             )
             .csrf(csrf -> {
-                csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+                csrf.csrfTokenRepository(csrfTokenRepository);
                 csrf.ignoringRequestMatchers("/api/chatbot/**");
                 if (environment.acceptsProfiles(Profiles.of("dev"))) {
                     csrf.ignoringRequestMatchers("/h2-console/**", "/api/oop/**");
