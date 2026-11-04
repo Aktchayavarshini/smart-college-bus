@@ -49,6 +49,10 @@ jobs:
           cache: maven
       - name: Provision production schema in MySQL service
         run: docker run --rm --network host mysql:8.4 mysql --protocol=tcp -h127.0.0.1 -uroot -proot < database/CollegeBusDB-production-schema.sql
+      - name: Verify all 13 production tables exist
+        run: |
+          docker run --rm --network host mysql:8.4 mysql --protocol=tcp -h127.0.0.1 -uroot -proot -N -e "SHOW TABLES FROM CollegeBusDB" | tee /tmp/collegebus-tables.txt
+          test "$(wc -l < /tmp/collegebus-tables.txt)" -eq 13
       - name: Run Maven tests
         run: bash ./mvnw --batch-mode --no-transfer-progress clean verify
       - name: Build production container image
