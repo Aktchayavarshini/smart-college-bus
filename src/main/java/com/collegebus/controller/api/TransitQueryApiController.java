@@ -2,7 +2,6 @@ package com.collegebus.controller.api;
 
 import com.collegebus.dto.BusSearchDto;
 import com.collegebus.dto.TripCardDto;
-import com.collegebus.entity.BusStop;
 import com.collegebus.service.BusStopService;
 import com.collegebus.service.TripService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -29,6 +28,11 @@ public class TransitQueryApiController {
     public TransitQueryApiController(TripService tripService, BusStopService busStopService) {
         this.tripService = tripService;
         this.busStopService = busStopService;
+    }
+
+    @GetMapping("/csrf")
+    public ResponseEntity<Map<String, String>> csrfToken(CsrfToken token) {
+        return ResponseEntity.ok(Map.of("headerName", token.getHeaderName(), "token", token.getToken()));
     }
 
     @GetMapping("/stops")
