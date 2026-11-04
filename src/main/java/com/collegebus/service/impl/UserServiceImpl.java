@@ -38,53 +38,64 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User registerUser(UserRegistrationDto dto) {
-        if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new IllegalArgumentException("An account with email " + dto.getEmail() + " already exists.");
-        }
+        if (dto == null) throw new IllegalArgumentException("Registration details are required.");
+        String email = dto.getEmail() == null ? "" : dto.getEmail().trim().toLowerCase();
+        if (email.isBlank()) throw new IllegalArgumentException("Email is required.");
+        if (userRepository.existsByEmail(email)) throw new IllegalArgumentException("An account with this email already exists.");
 
-        String role = dto.getRole().toUpperCase();
-        if ("ADMIN".equals(role)) {
-            throw new IllegalArgumentException("Direct registration for Administrator role is not permitted.");
+        String role = dto.getRole() == null ? "" : dto.getRole().trim().toUpperCase();
+        if (!"STUDENT".equals(role) && !"TEACHER".equals(role)) {
+            throw new IllegalArgumentException("Only student and teacher self-registration is permitted.");
+        }
+        if ("STUDENT".equals(role)) {
+            if (isBlank(dto.getRollNumber()) || isBlank(dto.getStudentDepartment())) {
+                throw new IllegalArgumentException("Student roll number and department are required.");
+            }
+            if (studentRepository.existsByRollNumber(dto.getRollNumber().trim())) {
+                throw new IllegalArgumentException("This student roll number is already registered.");
+            }
+        } else {
+            if (isBlank(dto.getEmployeeId()) || isBlank(dto.getTeacherDepartment()) || isBlank(dto.getDesignation())) {
+                throw new IllegalArgumentException("Teacher employee ID, department and designation are required.");
+            }
+            if (teacherRepository.existsByEmployeeId(dto.getEmployeeId().trim())) {
+                throw new IllegalArgumentException("This teacher employee ID is already registered.");
+            }
         }
 
         User user = new User();
-        user.setFullName(dto.getFullName());
-        user.setEmail(dto.getEmail().toLowerCase().trim());
+        user.setFullName(dto.getFullName().trim());
+        user.setEmail(email);
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        user.setPhoneNumber(dto.getPhoneNumber());
+        user.setPhoneNumber(dto.getPhoneNumber().trim());
         user.setRole(role);
         user.setAccountStatus("ACTIVE");
-
         User savedUser = userRepository.save(user);
 
         if ("STUDENT".equals(role)) {
-            if (studentRepository.existsByRollNumber(dto.getRollNumber())) {
-                throw new IllegalArgumentException("Roll number " + dto.getRollNumber() + " is already registered.");
-            }
             Student student = new Student();
             student.setUser(savedUser);
-            student.setRollNumber(dto.getRollNumber());
-            student.setDepartment(dto.getStudentDepartment());
+            student.setRollNumber(dto.getRollNumber().trim());
+            student.setDepartment(dto.getStudentDepartment().trim());
             student.setAcademicYear(dto.getAcademicYear() != null ? dto.getAcademicYear() : 1);
             student.setSemester(dto.getSemester() != null ? dto.getSemester() : 1);
             student.setStudentType(dto.getStudentType() != null ? dto.getStudentType() : "DAY_SCHOLAR");
             student.setHostelName(dto.getHostelName());
             studentRepository.save(student);
-        } else if ("TEACHER".equals(role)) {
-            if (teacherRepository.existsByEmployeeId(dto.getEmployeeId())) {
-                throw new IllegalArgumentException("Employee ID " + dto.getEmployeeId() + " is already registered.");
-            }
+        } else {
             Teacher teacher = new Teacher();
             teacher.setUser(savedUser);
-            teacher.setEmployeeId(dto.getEmployeeId());
-            teacher.setDepartment(dto.getTeacherDepartment());
-            teacher.setDesignation(dto.getDesignation());
+            teacher.setEmployeeId(dto.getEmployeeId().trim());
+            teacher.setDepartment(dto.getTeacherDepartment().trim());
+            teacher.setDesignation(dto.getDesignation().trim());
             teacherRepository.save(teacher);
         }
-
         return savedUser;
     }
 
+    private boolean isBlank(String value) {
+        return value == null || value.isBlank();
+    }
     @Override
     @Transactional(readOnly = true)
     public Optional<User> findByEmail(String email) {
