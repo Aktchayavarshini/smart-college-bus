@@ -2,6 +2,7 @@ package com.collegebus.controller.api;
 
 import com.collegebus.dto.BusSearchDto;
 import com.collegebus.dto.TripCardDto;
+import com.collegebus.entity.Trip;
 import com.collegebus.service.BusStopService;
 import com.collegebus.service.TripService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -77,8 +78,22 @@ public class TransitQueryApiController {
                 || !isActiveStop(pickupStopId) || !isActiveStop(dropoffStopId)) {
             return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(TripResponse.from(
-                tripService.getTripCardById(tripId, pickupStopId, dropoffStopId)));
+        Trip trip = tripService.getTripById(tripId);
+        if (!"SCHEDULED".equalsIgnoreCase(trip.getTripStatus())
+                || !"ACTIVE".equalsIgnoreCase(trip.getBus().getBusStatus())
+                || !"ACTIVE".equalsIgnoreCase(trip.getRoute().getRouteStatus())
+                || !"ACTIVE".equalsIgnoreCase(trip.getDriver().getDriverStatus())) {
+            return ResponseEntity.notFound().build();
+        }
+        TripCardDto card;
+        if (pickupStopId != null || dropoffStopId != null) {
+            card = tripService.searchTrips(new BusSearchDto(trip.getTravelDate(), "ALL", pickupStopId, dropoffStopId))
+                    .stream().filter(candidate -> candidate.getTripId().equals(tripId)).findFirst().orElse(null);
+            if (card == null) return ResponseEntity.notFound().build();
+        } else {
+            card = tripService.getTripCardById(tripId, null, null);
+        }
+        return ResponseEntity.ok(TripResponse.from(card));
     }
 
     private boolean isActiveStop(Long stopId) {
