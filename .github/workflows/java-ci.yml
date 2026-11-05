@@ -53,6 +53,14 @@ jobs:
         run: |
           docker run --rm --network host mysql:8.4 mysql --protocol=tcp -h127.0.0.1 -uroot -proot -N -e "SHOW TABLES FROM CollegeBusDB" | tee /tmp/collegebus-tables.txt
           test "$(wc -l < /tmp/collegebus-tables.txt)" -eq 13
+      - name: Provision synthetic campus dataset
+        run: docker run --rm -i --network host mysql:8.4 mysql --protocol=tcp -h127.0.0.1 -uroot -proot < database/CollegeBusDB-synthetic-campus-seed.sql
+      - name: Verify 350 synthetic students and 50 synthetic teachers
+        run: |
+          STUDENTS=$(docker run --rm --network host mysql:8.4 mysql --protocol=tcp -h127.0.0.1 -uroot -proot -N -e "SELECT COUNT(*) FROM CollegeBusDB.students s JOIN CollegeBusDB.users u ON u.user_id=s.user_id WHERE u.email LIKE 'student___@synthetic.collegebus.test' AND u.account_status='INACTIVE'")
+          TEACHERS=$(docker run --rm --network host mysql:8.4 mysql --protocol=tcp -h127.0.0.1 -uroot -proot -N -e "SELECT COUNT(*) FROM CollegeBusDB.teachers t JOIN CollegeBusDB.users u ON u.user_id=t.user_id WHERE u.email LIKE 'teacher__@synthetic.collegebus.test' AND u.account_status='INACTIVE'")
+          test "$STUDENTS" -eq 350
+          test "$TEACHERS" -eq 50
       - name: Create least-privilege application database user
         run: docker run --rm --network host mysql:8.4 mysql --protocol=tcp -h127.0.0.1 -uroot -proot -e "CREATE USER 'collegebus_app'@'%' IDENTIFIED BY 'ci-only-pass'; GRANT SELECT, INSERT, UPDATE, DELETE ON CollegeBusDB.* TO 'collegebus_app'@'%';"
       - name: Run Maven tests
