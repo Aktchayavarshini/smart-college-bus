@@ -55,6 +55,16 @@ jobs:
           test "$(wc -l < /tmp/collegebus-tables.txt)" -eq 13
       - name: Provision synthetic campus dataset
         run: docker run --rm -i --network host mysql:8.4 mysql --protocol=tcp -h127.0.0.1 -uroot -proot < database/CollegeBusDB-synthetic-campus-seed.sql
+      - name: Provision synthetic college transport network
+        run: docker run --rm -i --network host mysql:8.4 mysql --protocol=tcp -h127.0.0.1 -uroot -proot < database/CollegeBusDB-synthetic-transport-seed.sql
+      - name: Verify synthetic routes, fleet and schedules
+        run: |
+          ROUTES=$(docker run --rm --network host mysql:8.4 mysql --protocol=tcp -h127.0.0.1 -uroot -proot -N -e "SELECT COUNT(*) FROM CollegeBusDB.routes WHERE route_name LIKE 'SRP-FEEDER-%'")
+          MAIN_BUSES=$(docker run --rm --network host mysql:8.4 mysql --protocol=tcp -h127.0.0.1 -uroot -proot -N -e "SELECT COUNT(*) FROM CollegeBusDB.buses WHERE bus_number BETWEEN 'SYN-BUS-147' AND 'SYN-BUS-196'")
+          MAIN_ROUTE=$(docker run --rm --network host mysql:8.4 mysql --protocol=tcp -h127.0.0.1 -uroot -proot -N -e "SELECT COUNT(*) FROM CollegeBusDB.routes WHERE route_name='SRP-MAIN-001'")
+          test "$ROUTES" -eq 146
+          test "$MAIN_BUSES" -eq 50
+          test "$MAIN_ROUTE" -eq 1
       - name: Verify 350 synthetic students and 50 synthetic teachers
         run: |
           STUDENTS=$(docker run --rm --network host mysql:8.4 mysql --protocol=tcp -h127.0.0.1 -uroot -proot -N -e "SELECT COUNT(*) FROM CollegeBusDB.students s JOIN CollegeBusDB.users u ON u.user_id=s.user_id WHERE u.email LIKE 'student___@synthetic.collegebus.test' AND u.account_status='INACTIVE'")
